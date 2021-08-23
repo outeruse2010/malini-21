@@ -23,6 +23,7 @@ import {gridDate, gridDateTime} from '../utils/app_utils';
 import DueDetailEntry from './due_detail_entry';
 import { AppStyles } from '../utils/app_styles';
 import { useMemo } from 'react';
+import { customer_atom, fetch_customers } from '../customer/customer_api';
 
 
 const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal}) => {
@@ -37,13 +38,16 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
     const [act_cus_due_atom_res, setAct_cus_due_atom_res] = useRecoilState(act_cus_due_atom);
     const [act_message, setAct_message] = useRecoilState(message_atom);
     const [dialog_message, setDialog_message] = useRecoilState(dialog_atom);
+    const [customer_list, setCustomer_list] = useRecoilState(customer_atom);
 
     const [edit_marketing, setEdit_marketing] = useState(false);
     const [selected_mkt_due_row, setSeleted_mkt_due_row] = useState(null);
+    const [total_due, setTotal_due] = useState(null);
 
     useEffect(() => {
         if(selected_customer){
             let cus_id = selected_customer['cus_id'];
+            setTotal_due(selected_customer['total_due']); 
             const cus_due_res = fetch_customer_dues({cus_id});            
             cus_due_res.then(data => {
                 if(data['status'] === 'error'){
@@ -66,6 +70,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
                 if(data.status === 'success'){
                     const cus_due_res = fetch_customer_dues({cus_id});
                     cus_due_res.then(cus_dues => setDue_list(cus_dues));
+                    getCustomerDetails();
                 }            
                 setAct_message(data);
             });
@@ -93,6 +98,23 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
 
     const toggleEdit_marketingModal = () => {
         setEdit_marketing(!edit_marketing);
+        getCustomerDetails();
+    };
+
+    
+    const getCustomerDetails = () =>{
+        const customer_res = fetch_customers();
+        customer_res.then(data => {
+            setCustomer_list(data);
+            find_total_due(data);
+        });
+    }
+
+    const find_total_due = (cus_rows) =>{
+        let cus_id = selected_customer['cus_id'];
+        let filtered_rows = cus_rows.filter((r)=> (r['cus_id'] === cus_id));
+        let total_due = filtered_rows[0]['total_due'];
+        setTotal_due(total_due);
     };
 
     const renderEditButton = (params) => {
@@ -131,7 +153,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
             <Fade in={openDueDetailModal}>
                 <div className={classes.paper}>
                     <ModalHeader header='Payment/Due Details' toggleModal={toggleDueDetailModal}/>
-                    { cus_detail(selected_customer, classes) }
+                    { cus_detail(selected_customer,total_due, classes) }
 
                     <SnakbarComp />
                     
@@ -155,7 +177,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
 
 export default DueDetail;
 
-const cus_detail = (cus, classes) => {
+const cus_detail = (cus, total_due, classes) => {
     const cus_row = (field, value) => (
         <Box display='flex' flexDirection='row' className={classes.box_txt}>
                 <Box p={1}>{field}</Box> <Box p={1}>: </Box> <Box p={1}> {value}</Box>
@@ -167,11 +189,11 @@ const cus_detail = (cus, classes) => {
             { cus_row('Sr. No', cus.cus_sr) }
             { cus_row('Name', cus.full_name) }
             { cus_row('Address', cus.address) }
-            { cus_row('Total Due', cus.total_due) }
+            { cus_row('Total Due', total_due) }
         </div>
     );
     }
-}
+};
 
 const useStyles = makeStyles((theme) => ({
     modal: {
@@ -196,4 +218,3 @@ const useStyles = makeStyles((theme) => ({
     box_txt:{height: '16px', fontSize: 13, color: '#4527a0', marginBottom: theme.spacing(1)}
     
   }));
-

@@ -14,7 +14,6 @@ import ModalHeader from '../utils/ModalHeader';
 import SnakbarComp from '../utils/SnakbarComp';
 import { message_atom } from '../utils/SnakbarComp';
 import {cus_due_atom, act_cus_due_atom, fetch_customer_dues, add_update_cus_due} from './cus_due_api';
-import { customer_atom, fetch_customers } from '../customer/customer_api';
 
 const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing, toggleEdit_marketingModal}) => {
     const classes = useStyles();
@@ -31,8 +30,7 @@ const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing
     const [due_list, setDue_list] = useRecoilState(cus_due_atom);
     const [act_cus_due_atom_res, setAct_cus_due_atom_res] = useRecoilState(act_cus_due_atom);
     const [act_message, setAct_message] = useRecoilState(message_atom);
-    const [customer_list, setCustomer_list] = useRecoilState(customer_atom);
-    
+
     useEffect(()=>{
         onReset();
         if(selected_mkt_due_row){
@@ -69,8 +67,6 @@ const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing
                 toggleEdit_marketingModal(false);
                 const cus_due_res = fetch_customer_dues({cus_id});
                 cus_due_res.then(cus_dues => setDue_list(cus_dues));
-                const customer_res = fetch_customers();
-                customer_res.then(customers => setCustomer_list(customers));
             }            
             setAct_message(data);
         });
