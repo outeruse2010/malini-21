@@ -21,6 +21,7 @@ const Customers = () => {
 
     const login_data = useRecoilValue(login_atom);
     const user_name = login_data.user_name;
+    const allow_update = (login_data.allow_update === 'Y');
 
     const [openDia, setOpenDia] = useState(false);
     const [customer_list, setCustomer_list] = useRecoilState(customer_atom);
@@ -81,18 +82,22 @@ const Customers = () => {
         setOpenDia(false);
     };
      
-    const cus_grid_menus = ['Edit', 'Delete', 'Marketing Detail'];
+    const cus_grid_menus = ['Marketing Detail'];
+    if(allow_update){
+        cus_grid_menus.splice(0,0, 'Edit');
+        cus_grid_menus.splice(1,0, 'Delete');
+    }
 
     const onGirdMenuClick = (menu_item, row) => {
         setSelected_customer(row);
         switch (menu_item) {
-            case cus_grid_menus[0]: //Edit
+            case 'Edit':
                 setOpenCustomerModal(true);
                 break;
-            case cus_grid_menus[1]: //Delete
+            case 'Delete':
                 onDeleteClick(row);
                 break;
-            case cus_grid_menus[2]: //Marketing Detail
+            case 'Marketing Detail':
                 toggleDueDetailModal();
                 break;
         
@@ -134,7 +139,7 @@ const Customers = () => {
     const cus_header = ()=>(<Grid container direction="row" justifyContent="space-between" alignItems="center" className={classes.title_row}>
                                 <Typography variant="h6"> Customers </Typography>
                                 <GridToolbar/>
-                                <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New </Button>
+                               {allow_update  &&  <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New </Button>}
                             </Grid>);
 
     return (

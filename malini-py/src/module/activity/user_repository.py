@@ -17,8 +17,9 @@ def user_login(login_json):
     user_pass = login_json['user_pass']
     msg = ''
     res_json = {'user_name':user_name}
-    sql = f'''select cast(user_id as varchar) user_id from {DB_SCHEMA}.user_list 
-              where deleted='N' and user_name= '{user_name}' and user_pass ='{user_pass}' '''
+    sql = f'''select cast(u.user_id as varchar) user_id, r.role_name from {DB_SCHEMA}.user_list u, {DB_SCHEMA}.user_role_map r
+              where u.user_id = r.user_id and u.deleted='N' 
+              and u.user_name= '{user_name}' and u.user_pass ='{user_pass}' '''
     engine = db_engine()
     user_df = pd.read_sql_query(con=engine, sql=sql)
     # print(f'***user_df : {user_df}')
@@ -29,6 +30,7 @@ def user_login(login_json):
         try:
             user_id = user_df['user_id'].values[0]
             res_json['user_id'] = user_id
+            allow_update = 'Y' if user_df['role_name'].str.contains(UPDATE).any() else 'N'
 
             # check role before login
             role_sql = f'''select role_name from {DB_SCHEMA}.user_role_map where deleted='N' and user_id='{user_id}' '''
@@ -48,6 +50,7 @@ def user_login(login_json):
                 login_code_df = pd.read_sql_query(sql=login_sql, con=engine)
                 log_in_code = login_code_df['log_in_code'].values[0]
                 res_json['log_in_code'] = log_in_code
+                res_json['allow_update'] = allow_update
                 msg = f'User name [{user_name}] Login successful !!!'
                 status = SUCCESS
         except Exception as e:
@@ -163,13 +166,24 @@ def add_user_role_map(user_role_json):
 def fetch_users(input):
     log.info('fetch_users')
     engine = db_engine()
-    sql = f''' SELECT u.user_id, u.user_name, u.user_pass, 
+    sql = f''' SELECT u.user_id, u.user_name, 
                 u.created_on, u.created_by, u.updated_on, u.updated_by,r.role_name
                 FROM {DB_SCHEMA}.user_list u, {DB_SCHEMA}.user_role_map r 
-                WHERE u.user_id = r.user_id and u.deleted = 'N' '''
+                WHERE u.user_id = r.user_id and u.deleted = 'N' order by u.user_name '''
     df = pd.read_sql_query(con=engine, sql=sql)
     rs_json = df.to_json(orient="records")
     return rs_json
+
+def fetch_roles(input):
+    log.info('fetch_roles')
+    engine = db_engine()
+    sql = f''' SELECT role_name, description, created_on, created_by, updated_on, updated_by, deleted
+                FROM {DB_SCHEMA}.malini_roles 
+                WHERE deleted = 'N' '''
+    df = pd.read_sql_query(con=engine, sql=sql)
+    rs_json = df.to_json(orient="records")
+    return rs_json
+
 
 # usr = {'user_name': 'Test', 'user_pass': 'test', 'created_by':'Auto'}
 # add_new_user(usr)

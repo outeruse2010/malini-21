@@ -32,6 +32,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
 
     const login_data = useRecoilValue(login_atom);
     const user_name = login_data.user_name;
+    const allow_update = (login_data.allow_update === 'Y');
 
     const [openDia, setOpenDia] = useState(false);
     const [due_list, setDue_list] = useRecoilState(cus_due_atom);
@@ -134,9 +135,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
     }
 
     const columns = [
-        { field: "cus_due_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: "", headerName: "Delete", renderCell: renderDeleteButton,  width: 120 , disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: 'mkt_amount', headerName: 'Buy Amt', width: 180 , headerClassName: appcls.data_grid_header}
+        { field: 'mkt_amount', headerName: 'Buy Amt', width: 180 , headerClassName: appcls.data_grid_header}
         ,{ field: 'credit_amt', headerName: 'Payment', width: 180 , headerClassName: appcls.data_grid_header}
         ,{ field: 'mkt_pay_date', headerName: 'Marketing/Payment Dt', width: 200, valueGetter: gridDate , headerClassName: appcls.data_grid_header}
         ,{ field: 'comments', headerName: 'Comments', width: 300 , headerClassName: appcls.data_grid_header}
@@ -145,6 +144,11 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
         ,{ field: 'updated_by', headerName: 'Updated By', width: 200 , headerClassName: appcls.data_grid_header}
         ,{ field: 'updated_on', headerName: 'Updated On', width: 160, valueGetter: gridDateTime , headerClassName: appcls.data_grid_header}
         ];
+
+    if(allow_update){
+        columns.splice(0,0, { field: "cus_due_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: appcls.data_grid_header});
+        columns.splice(1,0, { field: "", headerName: "Delete", renderCell: renderDeleteButton,  width: 120 , disableColumnMenu:true, headerClassName: appcls.data_grid_header});
+    }
     
     const dialog_memo = useMemo(()=> <DialogComp show={openDia} onDialogClose={(ans)=> onDialogClose(ans)}/>, [openDia]);
 
@@ -159,7 +163,7 @@ const DueDetail = ({selected_customer, openDueDetailModal,toggleDueDetailModal})
                     
                     <Grid container direction="row" justifyContent="space-between" alignItems="center" className={appcls.title_row}>
                         <Typography variant="h6"> Customer Marketing </Typography>
-                        <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New </Button>
+                        {allow_update  &&  <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New </Button>}
                     </Grid>
                     
                     <div style={{ height: 300, width: '100%' }}>

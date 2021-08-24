@@ -22,6 +22,7 @@ const CustomerArea = () => {
     const classes = AppStyles();
     const login_data = useRecoilValue(login_atom);
     const user_name = login_data.user_name;
+    const allow_update = (login_data.allow_update === 'Y');
 
     const [openDia, setOpenDia] = useState(false);
     const [cus_area_list, setCus_area_list] = useRecoilState(cus_area_atom);
@@ -105,16 +106,19 @@ const CustomerArea = () => {
         );
     }
 
-    const columns = [
-        { field: "area_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: classes.data_grid_header}
-        ,{ field: "id", headerName: "Delete", renderCell: renderDeleteButton,  width: 120,  disableColumnMenu:true, headerClassName: classes.data_grid_header}
-        ,{ field: 'area_name', headerName: 'Area', width: 180, headerClassName: classes.data_grid_header}
+    const columns = [ 
+        { field: 'area_name', headerName: 'Area', width: 180, headerClassName: classes.data_grid_header}
         ,{ field: 'description', headerName: 'Description', width: 300, headerClassName: classes.data_grid_header}
         ,{ field: 'created_by', headerName: 'Created By', width: 200, headerClassName: classes.data_grid_header}
         ,{ field: 'created_on', headerName: 'Created On', width: 160, valueGetter: gridDateTime, headerClassName: classes.data_grid_header}
         ,{ field: 'updated_by', headerName: 'Updated By', width: 200, headerClassName: classes.data_grid_header}
         ,{ field: 'updated_on', headerName: 'Updated On', width: 160, valueGetter: gridDateTime, headerClassName: classes.data_grid_header}
         ];
+
+        if(allow_update){
+            columns.splice(0,0,{ field: "area_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: classes.data_grid_header} );
+            columns.splice(1,0,  { field: "id", headerName: "Delete", renderCell: renderDeleteButton,  width: 120,  disableColumnMenu:true, headerClassName: classes.data_grid_header});
+        }
 
     const dialog_memo = useMemo(()=> <DialogComp show={openDia} onDialogClose={(ans)=> onDialogClose(ans)}/>, [openDia]);
 
@@ -124,7 +128,7 @@ const CustomerArea = () => {
 
             <Grid container direction="row" justifyContent="space-between" alignItems="center" className={classes.title_row}>
                 <Typography variant="h6"> Customer Areas </Typography>
-                <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New Area</Button>
+                {allow_update  && <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New Area</Button>}
             </Grid>
 
             <div style={{ height: 500, width: '100%' }}>

@@ -31,7 +31,13 @@ def login():
 @app.route("/fetch_users",  methods=['POST'])
 def fetch_user_list():
     input = request.get_json()
-    res = perform_request(input, 'fetch_users',[UPDATE,VIEW], fetch_users)
+    res = perform_request(input, 'fetch_users',[VIEW], fetch_users)
+    return res
+
+@app.route("/fetch_roles",  methods=['POST'])
+def fetch_role_list():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_roles',[UPDATE], fetch_roles)
     return res
 
 @app.route('/add_user', methods=['POST'])
@@ -227,7 +233,6 @@ def perform_request(input, api_name, roles, callback_fun, comments=''):
     res = {}
     status = SUCCESS
     try:
-        print(f'****input: ',input)
         check_authentication(input, roles)
         trim_json(input, ['user_id', 'log_in_code', 'user_name'])
         res = callback_fun(input)
