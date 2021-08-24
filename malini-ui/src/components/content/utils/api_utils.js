@@ -57,6 +57,19 @@ export const post_request = (url, json_input = {}) =>{
     return postRequest;
 }
 
+export const call_rest_api = async (api, input={}) => {
+    try{
+      const req = post_request(api, input);
+      const res = await fetch(req);
+      const data = res.json();
+      return data;
+  }catch(err){
+      let msg = 'Failed To call backend api [ '+api+' ]. Please check server !!!';
+      console.error('Error :: ', msg);
+      return {"status": "error", "message": msg, "statusCode":500};
+  }
+};
+
 export const fetch_graphql_post = (url, query) => {
     const api = api_url(url);
     let response = {};

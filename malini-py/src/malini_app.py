@@ -27,11 +27,18 @@ def login():
     response.set_cookie("log_in_code", "log_in_code_value")
     return response
 
+
+@app.route("/fetch_users",  methods=['POST'])
+def fetch_user_list():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_users',[UPDATE,VIEW], fetch_users)
+    return res
+
 @app.route('/add_user', methods=['POST'])
 def new_user_add():
-    user_json = request.get_json()
-    res_json = add_new_user(user_json)
-    return res_json
+    input = request.get_json()
+    res = perform_request(input, 'add_user', [UPDATE], add_new_user)
+    return res
 
 @app.route('/assign_role', methods=['POST'])
 def assign_role():
@@ -220,6 +227,7 @@ def perform_request(input, api_name, roles, callback_fun, comments=''):
     res = {}
     status = SUCCESS
     try:
+        print(f'****input: ',input)
         check_authentication(input, roles)
         trim_json(input, ['user_id', 'log_in_code', 'user_name'])
         res = callback_fun(input)

@@ -125,9 +125,10 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
             if(data.status === 'success'){
                 const customer_res = fetch_customers();
                 customer_res.then(customers => setCustomer_list(customers));
-                if(do_update){
-                    toggleCustomerModal();
-                }
+                toggleCustomerModal();
+                // if(do_update){
+                //     toggleCustomerModal();
+                // }
             }            
             setAct_message(data);
         });

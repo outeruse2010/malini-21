@@ -10,6 +10,7 @@ import {login_atom,do_login} from './login_api';
 import {useRecoilState} from 'recoil';
 import { message_atom } from '../../content/utils/SnakbarComp';
 import SnakbarComp from '../../content/utils/SnakbarComp';
+import { SUCCESS } from './../utils/app_const';
 
 const UserLogin = () => {
     const classes = useStyles();
@@ -33,18 +34,25 @@ const UserLogin = () => {
             return;
         }
         const user_login_json = {user_name, user_pass};
+              
         const res_login = do_login(user_login_json);
+        
+        Cookies.remove('log_in_code');
+        Cookies.remove('user_id');
+        Cookies.remove('user_name');
 
         res_login.then(data => {
-            setLog_in_detail(data);
-            const log_in_code = data.log_in_code;
-            // const log_in_code = Cookies.get('log_in_code');
-            // console.log('***log_in_code: ',log_in_code);
-            Cookies.set('log_in_code',log_in_code);
-            Cookies.set('user_id',data.user_id);
-            Cookies.set('user_name',user_name);
-            setAct_message({'status': data.status, 'message': data.message});        
+            // console.log('***data: ',data);
+            if(data.status === SUCCESS){
+                setLog_in_detail(data);
+                const log_in_code = data.log_in_code;
+                Cookies.set('log_in_code',log_in_code);
+                Cookies.set('user_id',data.user_id);
+                Cookies.set('user_name',user_name);
+            }   
+            setAct_message({'status': data.status, 'message': data.message});  
         });
+        
 
     };
 

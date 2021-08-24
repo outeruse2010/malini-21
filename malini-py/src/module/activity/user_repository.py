@@ -159,6 +159,18 @@ def add_user_role_map(user_role_json):
     msg_json["message"] = msg
     return msg_json
 
+
+def fetch_users(input):
+    log.info('fetch_users')
+    engine = db_engine()
+    sql = f''' SELECT u.user_id, u.user_name, u.user_pass, 
+                u.created_on, u.created_by, u.updated_on, u.updated_by,r.role_name
+                FROM {DB_SCHEMA}.user_list u, {DB_SCHEMA}.user_role_map r 
+                WHERE u.user_id = r.user_id and u.deleted = 'N' '''
+    df = pd.read_sql_query(con=engine, sql=sql)
+    rs_json = df.to_json(orient="records")
+    return rs_json
+
 # usr = {'user_name': 'Test', 'user_pass': 'test', 'created_by':'Auto'}
 # add_new_user(usr)
 
