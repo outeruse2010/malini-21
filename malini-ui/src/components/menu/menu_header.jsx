@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import AppBar from '@material-ui/core/AppBar';
@@ -12,6 +12,7 @@ import {drawerWidth} from './menu_const';
 
 import {login_atom} from '../content/login/login_api';
 import {useRecoilValue} from 'recoil';
+import UserDetail from './../content/user/user_detail';
 
 function MenuHeader ({onMenuIconClick, open}) {
     const login_data = useRecoilValue(login_atom);
@@ -21,6 +22,11 @@ function MenuHeader ({onMenuIconClick, open}) {
       user_name = login_data.user_name;
     }    
     const classes = useStyles();
+
+    const [openUserDetailModal, setOpenUserDetailModal] = useState(false);
+
+    const toggleUserDetailModal = () => setOpenUserDetailModal(!openUserDetailModal);
+
     return (
         <AppBar position="fixed" className={clsx(classes.appBar, { [classes.appBarShift]: open, })} >
         <Toolbar>         
@@ -29,9 +35,10 @@ function MenuHeader ({onMenuIconClick, open}) {
                 <IconButton  onClick={() => onMenuIconClick()} color="inherit" aria-label="open drawer"  edge="start" className={clsx(classes.menuButton, open && classes.hide)} >
                   <MenuIcon /></IconButton>}
                   <Typography variant="h3" noWrap className={classes.title_color}> Malini </Typography>
-                  {success && <div><PersonIcon /><Typography noWrap className={classes.title_color}> {user_name} </Typography></div>}
+                  {success && <div> <IconButton onClick={toggleUserDetailModal }><PersonIcon /></IconButton><Typography noWrap className={classes.title_color}> {user_name} </Typography></div>}
             </Grid>
         </Toolbar>
+        <UserDetail openUserDetailModal={openUserDetailModal} toggleUserDetailModal={toggleUserDetailModal}/>
       </AppBar>
     );
 }

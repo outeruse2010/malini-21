@@ -166,7 +166,7 @@ def add_user_role_map(user_role_json):
 def fetch_users(input):
     log.info('fetch_users')
     engine = db_engine()
-    sql = f''' SELECT u.user_id, u.user_name, 
+    sql = f''' SELECT cast(u.user_id as varchar) user_id, cast(u.user_id as varchar) id,u.user_name, 
                 u.created_on, u.created_by, u.updated_on, u.updated_by,r.role_name
                 FROM {DB_SCHEMA}.user_list u, {DB_SCHEMA}.user_role_map r 
                 WHERE u.user_id = r.user_id and u.deleted = 'N' order by u.user_name '''
