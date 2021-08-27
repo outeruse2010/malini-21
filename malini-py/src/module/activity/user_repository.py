@@ -89,19 +89,54 @@ def allowed_to_do(user_id, log_in_code, role_list):
     log.info(f'allowed_to_do response : {res_json}')
     return res_json
 
-def add_new_user(user_json):
+def add_new_user(user_role_json):
     log.info(f'add_new_user....')
-    user_name = user_json['user_name']
-    msg = f'''User [{user_name}] added !!! '''
+    user_name = user_role_json['user_nm']
+    role_name = user_role_json['role_name']
+    created_by = user_role_json['created_by']
+    msg = f'''User [{user_name}] with role [{role_name}] added !!! '''
     msg_json = {}
     try:
+        user_json = {'user_name':user_name, 'user_pass': user_role_json['user_pass'], 'created_by':created_by}
         df = pd.DataFrame([user_json])
         engine = db_engine()
-        df.to_sql('user_list', con=engine, schema=DB_SCHEMA, if_exists='append', index=False)
+        with engine.begin() as con:
+            df.to_sql('user_list', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
+            role_map_sql = f''' INSERT INTO {DB_SCHEMA}.user_role_map (user_id, role_name, created_by)
+                                VALUES((select user_id from {DB_SCHEMA}.user_list 
+                                where user_name='{user_name}'), '{role_name}', '{created_by}') '''
+            con.execute(role_map_sql)
         msg_json['status'] = SUCCESS
     except Exception as ex:
         msg_json['status'] = ERROR
         msg = f'''Failed to add user [{user_name}] !!! '''
+        traceback.print_exc()
+    log.info(msg)
+    msg_json["message"] = msg
+    return msg_json
+
+def update_user(user_role_json):
+    log.info(f'update_user....')
+    user_id = user_role_json['usr_id']
+    user_name = user_role_json['user_nm']
+    role_name = user_role_json['role_name']
+    updated_by = user_role_json['updated_by']
+    msg = f'''User [{user_name}] with role [{role_name}] updated !!! '''
+    msg_json = {}
+    try:
+        engine = db_engine()
+        with engine.begin() as con:
+            usr_sql = f''' UPDATE {DB_SCHEMA}.user_list set user_name= '{user_name}',
+                    user_pass= '{user_role_json['user_pass']}', updated_by='{updated_by}' 
+                    where user_id ='{user_id}' '''
+            con.execute(usr_sql)
+            role_map_sql = f''' UPDATE {DB_SCHEMA}.user_role_map set role_name='{role_name}',
+                                 updated_by='{updated_by}' where user_id ='{user_id}' '''
+            con.execute(role_map_sql)
+        msg_json['status'] = SUCCESS
+    except Exception as ex:
+        msg_json['status'] = ERROR
+        msg = f'''Failed to update user [{user_name}] !!! '''
         traceback.print_exc()
     log.info(msg)
     msg_json["message"] = msg

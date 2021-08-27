@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 
 
-const AutoCompleteComp = ({label,value_list, label_field, value_field, value, onComboValueChange, required=false, variant="outlined"}) => {
+const AutoCompleteComp = ({label,value_list, label_field, value_field, value, onComboValueChange, required=false, variant="outlined", error=false}) => {
     const classes = useStyles();
     let option_list = [];
     let selected_value = {};
@@ -39,6 +39,7 @@ const AutoCompleteComp = ({label,value_list, label_field, value_field, value, on
                 {...params}
                 label={label}
                 required={required}
+                error={error}
                 variant={variant}
                 inputProps={{
                     ...params.inputProps,

@@ -31,7 +31,7 @@ def login():
 @app.route("/fetch_users",  methods=['POST'])
 def fetch_user_list():
     input = request.get_json()
-    res = perform_request(input, 'fetch_users',[VIEW], fetch_users)
+    res = perform_request(input, 'fetch_users',[VIEW,UPDATE], fetch_users)
     return res
 
 @app.route("/fetch_roles",  methods=['POST'])
@@ -44,6 +44,12 @@ def fetch_role_list():
 def new_user_add():
     input = request.get_json()
     res = perform_request(input, 'add_user', [UPDATE], add_new_user)
+    return res
+
+@app.route('/update_user', methods=['POST'])
+def update_existing_user():
+    input = request.get_json()
+    res = perform_request(input, 'update_user', [UPDATE], update_user)
     return res
 
 @app.route('/assign_role', methods=['POST'])

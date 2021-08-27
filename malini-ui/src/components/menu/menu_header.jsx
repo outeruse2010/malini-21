@@ -5,7 +5,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import PersonIcon from '@material-ui/icons/Person';
+import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import {drawerWidth} from './menu_const';
@@ -35,7 +35,7 @@ function MenuHeader ({onMenuIconClick, open}) {
                 <IconButton  onClick={() => onMenuIconClick()} color="inherit" aria-label="open drawer"  edge="start" className={clsx(classes.menuButton, open && classes.hide)} >
                   <MenuIcon /></IconButton>}
                   <Typography variant="h3" noWrap className={classes.title_color}> Malini </Typography>
-                  {success && <div> <IconButton onClick={toggleUserDetailModal }><PersonIcon /></IconButton><Typography noWrap className={classes.title_color}> {user_name} </Typography></div>}
+                  {success && <div> <IconButton onClick={toggleUserDetailModal }><PersonAddIcon /></IconButton><Typography noWrap className={classes.title_color}> {user_name} </Typography></div>}
             </Grid>
         </Toolbar>
         <UserDetail openUserDetailModal={openUserDetailModal} toggleUserDetailModal={toggleUserDetailModal}/>

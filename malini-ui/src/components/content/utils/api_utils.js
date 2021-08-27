@@ -41,8 +41,6 @@ export const post_request = (url, json_input = {}) =>{
     if(Cookies.get('user_name')){
       json_input['user_name'] = Cookies.get('user_name');
     }
-    
-    headers.append('set-cookie', 'log_in_code=Test1');    
 
     const api = api_url(url);
 

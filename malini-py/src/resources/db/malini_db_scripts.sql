@@ -11,7 +11,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE malini_schema.user_list(
    user_id uuid  DEFAULT uuid_generate_v4(),
    user_name text not null,
-   user_pass text not null,
+   user_pass text null,
    created_on timestamp default now(),
    created_by text,
    updated_on timestamp,

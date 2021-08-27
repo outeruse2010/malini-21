@@ -21,6 +21,8 @@ import { AppStyles } from '../utils/app_styles';
 import {login_atom} from '../login/login_api';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import { fetch_users, user_atom } from './user_api';
+import UserDetailEntry from './user_detail_entry';
+
 
 const UserDetail = ({openUserDetailModal, toggleUserDetailModal}) => {
 
@@ -32,8 +34,10 @@ const UserDetail = ({openUserDetailModal, toggleUserDetailModal}) => {
     const allow_update = (login_data.allow_update === 'Y');
 
     const [user_list, setUser_list] = useRecoilState(user_atom);
+    
 
     const [openDia, setOpenDia] = useState(false);
+    const [dialog_message, setDialog_message] = useRecoilState(dialog_atom);
     const [selected_user_row, setSeleted_user_row] = useState(null);
 
     
@@ -88,6 +92,23 @@ const UserDetail = ({openUserDetailModal, toggleUserDetailModal}) => {
     };
 
 
+    const renderEditButton = (params) => {
+        return (
+            <IconButton onClick={() => {onEditClick(params.row);}}>
+                <Tooltip title="Edit" arrow><EditIcon fontSize="small" color='primary'/></Tooltip>
+            </IconButton>
+        );
+    }
+
+    const renderDeleteButton = (params) => {
+        return (
+            <IconButton onClick={() => {onDeleteClick(params.row) }}>
+                <Tooltip title="Delete" arrow><DeleteIcon fontSize="small"  color='secondary'/></Tooltip>
+            </IconButton>
+        );
+    }
+
+
     const columns = [
         { field: 'user_name', headerName: 'User Name', width: 250 , headerClassName: appcls.data_grid_header}
         ,{ field: 'role_name', headerName: 'Role', width: 200 , headerClassName: appcls.data_grid_header}
@@ -98,9 +119,9 @@ const UserDetail = ({openUserDetailModal, toggleUserDetailModal}) => {
         ];
 
     if(allow_update){
-        columns.splice(0,0, { field: "user_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: appcls.data_grid_header});
-        columns.splice(1,0, { field: "id", headerName: "Delete", renderCell: renderDeleteButton,  width: 120 , disableColumnMenu:true, headerClassName: appcls.data_grid_header});
+        columns.splice(0,0, { field: "user_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: appcls.data_grid_header}); 
     }
+   // columns.splice(1,0, { field: "id", headerName: "Delete", renderCell: renderDeleteButton,  width: 120 , disableColumnMenu:true, headerClassName: appcls.data_grid_header});
     
     const dialog_memo = useMemo(()=> <DialogComp show={openDia} onDialogClose={(ans)=> onDialogClose(ans)}/>, [openDia]);
 
@@ -123,7 +144,7 @@ const UserDetail = ({openUserDetailModal, toggleUserDetailModal}) => {
 
                     {dialog_memo}
 
-                   
+                   <UserDetailEntry selected_user_row={selected_user_row} openEditUserModal={openEditUserModal} toggleEditUserModal={toggleEditUserModal}/>
                 </div>
             </Fade>
         </Modal>
