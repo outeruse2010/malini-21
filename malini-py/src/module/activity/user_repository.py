@@ -67,24 +67,34 @@ def user_login(login_json):
 
 def allowed_to_do(user_id, log_in_code, role_list):
     log.info(f'''User [{user_id}], check allowed_to_do''')
-    engine = db_engine()
-    login_sql = f'''select cast(log_in_code as varchar) log_in_code from {DB_SCHEMA}.log_in_detail 
-    where user_id='{user_id}' and log_in_code='{log_in_code}' '''
-    login_code_df = pd.read_sql_query(sql=login_sql, con=engine)
-    status = ERROR
-    msg = f'''User [{user_id}] is allowed. '''
+    res_json = {}
     allowed = False
-    if login_code_df.empty:
-        msg = f'''User [{user_id}] is not logged in !!!! '''
-    else:
-        role_sql = f'''select role_name from {DB_SCHEMA}.user_role_map where deleted='N' 
-            and user_id='{user_id}' and role_name in ('{ "','".join(role_list)}') '''
-        role_df = pd.read_sql_query(con=engine, sql=role_sql)
-        if role_df.empty:
-            msg = f'''User [{user_id}] does not have valid role !!!! '''
+    status = ERROR
+    msg = ''
+    try:
+        if not user_id or not log_in_code:
+            msg= 'User not logged in !!!!'
+            log.info(msg)
+            return {'message': msg, 'allowed': allowed, 'status': status}
+        engine = db_engine()
+        login_sql = f'''select cast(log_in_code as varchar) log_in_code from {DB_SCHEMA}.log_in_detail 
+        where user_id='{user_id}' and log_in_code='{log_in_code}' '''
+        login_code_df = pd.read_sql_query(sql=login_sql, con=engine)
+        if login_code_df.empty:
+            msg = f'''User [{user_id}] is not logged in !!!! '''
         else:
-            allowed = True
-            status = SUCCESS
+            role_sql = f'''select role_name from {DB_SCHEMA}.user_role_map where deleted='N' 
+                and user_id='{user_id}' and role_name in ('{ "','".join(role_list)}') '''
+            role_df = pd.read_sql_query(con=engine, sql=role_sql)
+            if role_df.empty:
+                msg = f'''User [{user_id}] does not have valid role !!!! '''
+            else:
+                allowed = True
+                status = SUCCESS
+                msg = f'''User [{user_id}] is allowed. '''
+    except Exception as e:
+        msg = f'''Exception in user role check !!! '''
+        traceback.print_exc()
     res_json = {'message': msg, 'allowed': allowed, 'status': status}
     log.info(f'allowed_to_do response : {res_json}')
     return res_json

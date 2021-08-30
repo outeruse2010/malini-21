@@ -15,10 +15,12 @@ import MenuDrawer from './menu_drawer';
 import {drawerWidth} from './menu_const';
 import ExpenseTypes from '../content/sale_expense/expense_types';
 import DailySaleExpense from '../content/sale_expense/daily_sale_expense';
+import DashBoard from './../content/dashboard/dash_board';
 
 const menu_items = [  
-  {"title": "Customer Area","component": CustomerArea, "path": "/customer_areas", "icon": "", "divide": false}
-  ,{"title": "Customers","component": Customers, "path": "/", "icon": "", "divide": false}
+  {"title": "Dashboard","component": DashBoard, "path": "/", "icon": "", "divide": false}
+ , {"title": "Customer Area","component": CustomerArea, "path": "/customer_areas", "icon": "", "divide": false}
+  ,{"title": "Customers","component": Customers, "path": "/customers", "icon": "", "divide": false}
   ,{"title": "Expense Types","component": ExpenseTypes, "path": "/expense_types", "icon": "", "divide": false}
   ,{"title": "Daily Sale Expense","component": DailySaleExpense, "path": "/daily_sale_expense", "icon": "", "divide": false}
                     ];

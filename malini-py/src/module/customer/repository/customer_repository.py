@@ -30,15 +30,30 @@ def fetch_customer_dues(input={}):
             c.cus_sr, c.first_name, c.mid_name, c.last_name,concat(c.first_name,' ', c.mid_name,' ', c.last_name) full_name ,c.address, 
             cast(c.area_id as varchar) area_id, c.email, c.phone, 
             c.comments, c.created_on, c.created_by, c.updated_on, c.updated_by, c.deleted, 
-            d.total_mkt_amount, d.total_credit_amt, d.total_due, a.area_name
+            d.total_mkt_amount, d.total_credit_amt, d.total_due, d.last_marketing_date, DATE_PART('day',now() - d.last_marketing_date) no_of_days_ago,
+            a.area_name
             FROM {DB_SCHEMA}.cus_area a join {DB_SCHEMA}.customer c on  a.area_id = c.area_id 
             LEFT JOIN 
             (SELECT cus_id, sum(mkt_amount) total_mkt_amount, sum(credit_amt) total_credit_amt, (sum(mkt_amount) - sum(credit_amt)) total_due
+            , max(mkt_pay_date) last_marketing_date 
             FROM {DB_SCHEMA}.cus_due where deleted = 'N' group by cus_id ) d
             ON c.cus_id = d.cus_id and c.deleted = 'N' '''
     engine = db_engine()
     df = pd.read_sql(con=engine, sql=sql)
     log.info(f'customers no of rows and columns selected : {df.shape}')
+    rs_json = df.to_json(orient="records")
+    return rs_json
+
+def customer_dashboard_data(input={}):
+    log.info('customer_dashboard_data....')
+    sql = f''' select cast(d.area_id as varchar) area_id,a.area_name, sum(d.mkt_amount) total_maketing, 
+                sum(d.mkt_amount - d.credit_amt) total_due, count(c.cus_id) no_of_customers
+                from malini_schema.customer c , malini_schema.cus_due d , malini_schema.cus_area a 
+                where d.deleted = 'N'  and c.area_id = a.area_id and c.cus_id = d.cus_id and a.area_id = d.area_id
+                group by d.area_id,a.area_name '''
+    engine = db_engine()
+    df = pd.read_sql(con=engine, sql=sql)
+    log.info(f'customer_dashboard_data no of rows and columns found : {df.shape}')
     rs_json = df.to_json(orient="records")
     return rs_json
 
@@ -59,13 +74,15 @@ def add_customer(cus_json):
                  'created_by']]
             cus_df.to_sql('customer', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
             log.info(f'''customer [#{cus_sr}, {first_name}] inserted !!!''')
-            if float(mkt_amount) > 0:
-                sql = f'''select cus_id from {DB_SCHEMA}.customer where cus_sr = '{cus_sr}' '''
-                cus_id_df = pd.read_sql_query(sql=sql, con=con)
-                due_df = df[['mkt_amount', 'area_id', 'comments', 'created_by']]
-                due_df['cus_id'] = cus_id_df['cus_id']
-                due_df.to_sql('cus_due', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
-                log.info(f'''customer [#{cus_sr}, {first_name}] due amount: [{mkt_amount}] inserted !!!''')
+
+            # if float(mkt_amount) > 0:
+            sql = f'''select cus_id from {DB_SCHEMA}.customer where cus_sr = '{cus_sr}' '''
+            cus_id_df = pd.read_sql_query(sql=sql, con=con)
+            due_df = df[['mkt_amount', 'area_id', 'comments', 'created_by']]
+            due_df['cus_id'] = cus_id_df['cus_id']
+            due_df.to_sql('cus_due', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
+            log.info(f'''customer [#{cus_sr}, {first_name}] due amount: [{mkt_amount}] inserted !!!''')
+
             status = SUCCESS
             log.info(f'''customer data insert committed !!!''')
     except Exception as ex:

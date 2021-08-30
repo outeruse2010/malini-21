@@ -10,3 +10,6 @@ SUCCESS,ERROR = 'success','error'
 
 VIEW, UPDATE = 'view','update'
 
+VIEW_ROLE = [VIEW, UPDATE]
+ACTION_ROLE = [UPDATE]
+

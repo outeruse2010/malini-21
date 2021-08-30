@@ -65,9 +65,7 @@ const CustomerAreaEntry = ({selected_area, openAreaModal, toggleAreaModal}) => {
             if(data.status === 'success'){
                 const cus_area_res = fetch_customer_areas();
                 cus_area_res.then(cus_areas => setCus_area_list(cus_areas));
-                if(do_update){
-                    toggleAreaModal();
-                }
+                toggleAreaModal();
             }            
             setAct_message(data);
         });

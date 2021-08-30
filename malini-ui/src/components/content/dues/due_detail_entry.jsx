@@ -27,6 +27,8 @@ const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing
     const [mkt_pay_date, setMkt_pay_date] = useState(null);
     const [comments, setComments] = useState('');
 
+    const [mktPayDateErr, setMktPayDateErr] = useState(false);
+
     const [due_list, setDue_list] = useRecoilState(cus_due_atom);
     const [act_cus_due_atom_res, setAct_cus_due_atom_res] = useRecoilState(act_cus_due_atom);
     const [act_message, setAct_message] = useRecoilState(message_atom);
@@ -52,8 +54,12 @@ const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing
     const onSubmit = (e) => {
         e.preventDefault();
         let cus_id = selected_customer['cus_id'];
+        let area_id = selected_customer['area_id'];
+        if(!mkt_pay_date){
+            setMktPayDateErr(true);
+        }
         
-        const due_json = {cus_id,  'mkt_amount': mkt_amount || 0, 'credit_amt':credit_amt || 0,'mkt_pay_date':mkt_pay_date, 'comments':comments};
+        const due_json = {cus_id,  area_id,  'mkt_amount': mkt_amount || 0, 'credit_amt':credit_amt || 0,'mkt_pay_date':mkt_pay_date, 'comments':comments};
         if(selected_mkt_due_row){
             due_json['cus_due_id']= selected_mkt_due_row['cus_due_id'];
             due_json['updated_by']= user_name;
@@ -91,8 +97,8 @@ const DueDetailEntry = ({selected_customer, selected_mkt_due_row, edit_marketing
                 <form onSubmit={onSubmit} onReset={onReset} noValidate autoComplete="off"> 
                     <TextField type='number' value={mkt_amount} onChange={e=>setMkt_amount(e.target.value)} label="Marketing (Rs.)" fullWidth variant="outlined" className={classes.field} size="small"/>
                     <TextField type='number' value={credit_amt} onChange={e=>setCredit_amt(e.target.value)} label="Payment (Rs.)" fullWidth variant="outlined" className={classes.field} size="small"/>
-                    <TextField type="date"  value={mkt_pay_date} onChange={(e) => setMkt_pay_date(e.target.value)} 
-                           label="Marketing/Payment Date (dd/mm/yyyy)" variant="outlined" className={classes.field} fullWidth  InputLabelProps={{ shrink: true, }} size="small"/>
+                    <TextField type="date"  value={mkt_pay_date} onChange={(e) =>{ setMkt_pay_date(e.target.value); setMktPayDateErr(false);} }
+                           label="Marketing/Payment Date (dd/mm/yyyy)" variant="outlined" className={classes.field} fullWidth  InputLabelProps={{ shrink: true, }} size="small" required error={mktPayDateErr}/>
                     <TextField value={comments} onChange={e=>setComments(e.target.value)} label="Comments" fullWidth variant="outlined" className={classes.field} multiline rows={2} size="small"/>
                     <Button type="submit" variant="contained" color="primary" size="small">{action}</Button>
                     {(action === 'Add New') && <Button type="reset" variant="contained" size="small" className={classes.btn}>Reset</Button>}

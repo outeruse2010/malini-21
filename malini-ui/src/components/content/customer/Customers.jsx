@@ -106,15 +106,11 @@ const Customers = () => {
         }
     };
 
-    
-
     const renderGridMenuButton = (params) => {
         return (            
             <GridActionMenu menu_items={cus_grid_menus} row={params.row} onGirdMenuClick={onGirdMenuClick} />
         );
     }
-
-    
 
     const columns = [
         { field: "", headerName: "", renderCell: renderGridMenuButton, width: 20 , disableColumnMenu:true, headerClassName: classes.data_grid_header}
@@ -122,6 +118,8 @@ const Customers = () => {
         ,{ field: 'full_name', headerName: 'Name', width: 200, headerClassName: classes.data_grid_header}
         ,{ field: 'area_name', headerName: 'Location', width: 200, headerClassName: classes.data_grid_header}
         ,{ field: 'total_due', headerName: 'Due (Rs.)', width: 160, headerClassName: classes.data_grid_header, type:'number'}
+        ,{ field: 'last_marketing_date', headerName: 'Last Came On', width: 170, valueGetter: gridDateTime, headerClassName: classes.data_grid_header, type:'date'}
+        ,{ field: 'no_of_days_ago', headerName: 'No Of Days Ago', width: 175, headerClassName: classes.data_grid_header, type:'number'}
         ,{ field: 'total_mkt_amount', headerName: 'Marketing (Rs.)', width: 160, headerClassName: classes.data_grid_header, type:'number'}
         ,{ field: 'total_credit_amt', headerName: 'Paid (Rs.)', width: 160, headerClassName: classes.data_grid_header, type:'number'}
         ,{ field: 'address', headerName: 'Address', width: 200, headerClassName: classes.data_grid_header}

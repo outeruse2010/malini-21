@@ -17,8 +17,8 @@ def daily_sale_expenses(input={}):
     engine = db_engine()
     sql = f''' SELECT cast(se.sale_expense_id as varchar) sale_expense_id, cast(se.sale_expense_id as varchar) id, 
                 cast(se.expense_type_id as varchar) expense_type_id, e.expense_name,
-                se.cash_sale_amount, se.expense_amt, se.sale_expense_date, se."comments",
-                se.created_on, se.created_by, se.updated_on, se.updated_by, se.deleted
+                se.cash_sale_amount, se.expense_amt, se.sale_expense_date, to_char(se.sale_expense_date,'DD-Mon-YYYY') sale_expense_date_str,
+                se."comments", se.created_on, se.created_by, se.updated_on, se.updated_by, se.deleted
                 FROM {DB_SCHEMA}.daily_sale_expense se, {DB_SCHEMA}.expense_type e
                 where se.expense_type_id = e.expense_type_id and se.deleted = 'N' order by created_on desc '''
 

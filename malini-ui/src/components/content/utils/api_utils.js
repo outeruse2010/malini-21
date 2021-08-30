@@ -33,15 +33,16 @@ async function postData(url = '', data = {}) {
 
 export const api_url = (url) => ("http://127.0.0.1:5000/"+url); 
 
-export const post_request = (url, json_input = {}) =>{
+export const post_request = (url, json_input = {}, in_req = false) =>{
     const headers = new Headers();
     headers.append('Content-Type', 'application/json');
-    json_input['log_in_code'] = Cookies.get('log_in_code');
-    json_input['user_id'] = Cookies.get('user_id');
-    if(Cookies.get('user_name')){
-      json_input['user_name'] = Cookies.get('user_name');
+    if(! in_req){
+      const get_value = (prop) =>  Cookies.get(prop) ?  Cookies.get(prop) : '';
+      json_input['log_in_code'] = get_value('log_in_code');
+      json_input['user_id'] = get_value('user_id');
+      json_input['user_name'] = get_value('user_name');
     }
-
+   
     const api = api_url(url);
 
     const postRequest = new Request(api, {
@@ -55,9 +56,9 @@ export const post_request = (url, json_input = {}) =>{
     return postRequest;
 }
 
-export const call_rest_api = async (api, input={}) => {
+export const call_rest_api = async (api, input={},  in_req = false) => {
     try{
-      const req = post_request(api, input);
+      const req = post_request(api, input,in_req);
       const res = await fetch(req);
       const data = res.json();
       return data;

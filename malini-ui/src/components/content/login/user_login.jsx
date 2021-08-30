@@ -33,7 +33,7 @@ const UserLogin = () => {
             setUser_pass_err(true);
             return;
         }
-        const user_login_json = {user_name, user_pass};
+        const user_login_json = {'user_name': user_name, 'user_pass': user_pass};
               
         const res_login = do_login(user_login_json);
         

@@ -124,7 +124,7 @@ CREATE TABLE malini_schema.cus_due(
    cus_id uuid not null,
    mkt_amount decimal DEFAULT 0,
    credit_amt decimal DEFAULT 0,
-   mkt_pay_date date,
+   mkt_pay_date date default now(),
    area_id uuid,
    comments text,
    created_on timestamp default now(),
