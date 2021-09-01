@@ -1,19 +1,12 @@
 import React, {useState, useEffect, useMemo} from 'react';
 
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import {login_atom} from '../login/login_api';
 import { message_atom } from '../utils/SnakbarComp';
 import {useRecoilState, useRecoilValue} from 'recoil';
 import { fetch_sale_expense_dashboard_data} from './dashboard_api';
-import { DataGrid } from '@material-ui/data-grid';
 import { CustomLineChart, CustomAreaChart, useStyles, CustomBarChart, DasboardDataGrid } from './chart_utils';
 import { gridDateTime } from './../utils/app_utils';
-
-import Card from '@material-ui/core/Card';
-import { CardHeader } from '@material-ui/core';
-import Typography from '@material-ui/core/Typography';
-
 
 const SaleExpense = () => {
     const classes = useStyles();
@@ -29,7 +22,6 @@ const SaleExpense = () => {
     useEffect(()=>{
         const sale_exp_res = fetch_sale_expense_dashboard_data();
         sale_exp_res.then(data => {
-            console.log('****data: ',data);
             if(data['status'] === 'error'){
                 setAct_message(sale_exp_res);
             }else {                
