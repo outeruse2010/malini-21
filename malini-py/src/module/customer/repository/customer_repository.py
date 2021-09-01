@@ -46,7 +46,7 @@ def fetch_customer_dues(input={}):
 
 def customer_dashboard_data(input={}):
     log.info('customer_dashboard_data....')
-    sql = f''' select cast(d.area_id as varchar) area_id,a.area_name, sum(d.mkt_amount) total_maketing, 
+    sql = f''' select cast(d.area_id as varchar) id,a.area_name, sum(d.mkt_amount) total_maketing, 
                 sum(d.mkt_amount - d.credit_amt) total_due, count(c.cus_id) no_of_customers
                 from malini_schema.customer c , malini_schema.cus_due d , malini_schema.cus_area a 
                 where d.deleted = 'N'  and c.area_id = a.area_id and c.cus_id = d.cus_id and a.area_id = d.area_id
@@ -78,7 +78,7 @@ def add_customer(cus_json):
             # if float(mkt_amount) > 0:
             sql = f'''select cus_id from {DB_SCHEMA}.customer where cus_sr = '{cus_sr}' '''
             cus_id_df = pd.read_sql_query(sql=sql, con=con)
-            due_df = df[['mkt_amount', 'area_id', 'comments', 'created_by']]
+            due_df = df[['mkt_amount', 'mkt_pay_date', 'area_id', 'comments', 'created_by']]
             due_df['cus_id'] = cus_id_df['cus_id']
             due_df.to_sql('cus_due', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
             log.info(f'''customer [#{cus_sr}, {first_name}] due amount: [{mkt_amount}] inserted !!!''')

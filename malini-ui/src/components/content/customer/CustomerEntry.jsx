@@ -18,6 +18,7 @@ import AutoCompleteComp from '../utils/AutoCompleteComp';
 import Grid from '@material-ui/core/Grid';
 import CustomerAreaEntry from './CustomerAreaEntry';
 import ModalHeader from '../utils/ModalHeader';
+import moment from 'moment';
 
 
 
@@ -41,15 +42,15 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
     const [phone, setPhone] = useState('');
     const [comments, setComments] = useState('');
     const [mkt_amount, setMkt_amount] = useState('');
+    const [mkt_pay_date, setMkt_pay_date] = useState(null);
 
     const [openAreaModal, setOpenAreaModal] = useState(false);
 
-    const [cus_srErr, setCus_srErr] = useState(false);
+    const [cus_srErr, setCus_srErr] = useState(null);
     const [first_nameErr, setFirst_nameErr] = useState(false);
     const [addressErr, setAddressErr] = useState(false);
     const [area_idErr, setArea_idErr] = useState(false);
-
-    
+    const [mktPayDateErr, setMktPayDateErr] = useState(false); 
 
     const [customer_list, setCustomer_list] = useRecoilState(customer_atom);
     const [act_customer_res, setAct_customer_res] = useRecoilState(act_customer_atom);
@@ -76,6 +77,11 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
             setPhone(empty_value(selected_customer.phone));
             setComments(empty_value(selected_customer.comments));
             setMkt_amount(selected_customer.mkt_amount || 0);
+            let dt = selected_customer['mkt_pay_date'];
+            if(dt){
+                let val = moment(dt).format('YYYY-MM-DD');
+                setMkt_pay_date(val);
+            }
         }
     }, [openCustomerModal]);
  
@@ -90,6 +96,8 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
         setPhone('');
         setComments('');
         setMkt_amount('');
+        setMkt_pay_date(null);
+        setMktPayDateErr(false);
     }
 
     const onAreaChange = (selected_area_id) => {
@@ -103,18 +111,30 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
 
     const onSubmit = (e) => {
         e.preventDefault();
-        if(!cus_sr){ setCus_srErr(true); return; }
+        let do_update = (action === 'Update');
+        
+        if(!cus_sr){ 
+            setCus_srErr(true); return; 
+        }else if(cus_sr && !do_update){
+            let filtered_rows = customer_list.filter((r)=> (r['cus_sr'] === cus_sr));
+            if(filtered_rows && filtered_rows.length>0){
+                setCus_srErr('Serial No. ['+cus_sr+']  already exists.');
+                 return; 
+            }
+        }
+        
         if(!first_name){ setFirst_nameErr(true); return; }
         if(!address){ setAddressErr(true); return; }
         if(!area_id){ setArea_idErr(true); return; }
+        if(!do_update && !mkt_pay_date){  setMktPayDateErr(true); return; }
         
         let customer_json = { 'cus_sr':cus_sr, 'first_name':first_name, 'mid_name':mid_name, 'last_name':last_name, 
-                            'address':address , 'area_id':area_id , 'email':email, 'phone':phone , 
+                            'address':address , 'area_id':area_id , 'email':email, 'phone':phone , 'mkt_pay_date':mkt_pay_date,
                             'comments':comments ,'mkt_amount': mkt_amount || 0, 'cus_id':cus_id };
         
-        let do_update = false;
-        if(action === 'Update'){
-            do_update = true; customer_json['updated_by'] = user_name;
+        
+        if(do_update){
+            customer_json['updated_by'] = user_name;
         }else{
             customer_json['created_by'] = user_name;
         }
@@ -126,9 +146,6 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
                 const customer_res = fetch_customers();
                 customer_res.then(customers => setCustomer_list(customers));
                 toggleCustomerModal();
-                // if(do_update){
-                //     toggleCustomerModal();
-                // }
             }            
             setAct_message(data);
         });
@@ -144,14 +161,14 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
                         <ModalHeader header={action + ' Customer'} toggleModal={toggleCustomerModal}/>
 
                         <form onSubmit={onSubmit} onReset={onReset} noValidate autoComplete="off">                            
-                            <TextField value={cus_sr} onChange={e=>{setCus_sr(e.target.value);setCus_srErr(false);}} error={cus_srErr} label="Serial No." fullWidth variant="outlined" required className={classes.field} size="small"/>
+                            <TextField value={cus_sr} onChange={e=>{setCus_sr(e.target.value);setCus_srErr(null);}} error={(cus_srErr)} helperText={cus_srErr} label="Serial No." fullWidth variant="outlined" required className={classes.field} size="small"/>
                             <TextField value={first_name} onChange={e=>{setFirst_name(e.target.value);setFirst_nameErr(false);}} error={first_nameErr} label="First Name" fullWidth variant="outlined" required className={classes.field} size="small"/>
                             <TextField value={mid_name} onChange={e=>setMid_name(e.target.value)} label="Middle Name" fullWidth variant="outlined" className={classes.field} size="small"/>
                             <TextField value={last_name} onChange={e=>setLast_name(e.target.value)} label="Last Name" fullWidth variant="outlined" className={classes.field} size="small"/>
                             <TextField value={address} onChange={e=>{setAddress(e.target.value);setAddressErr(false);}} error={addressErr} label="Address" fullWidth variant="outlined" required className={classes.field} size="small"/>
                             <Grid container spacing={1}>
                                 <Grid item xs={10}>
-                                    <AutoCompleteComp label='Area Name' value_list={cus_areas} label_field={'area_name'} value_field={'area_id'} value={area_id} onComboValueChange = {onAreaChange} required={true}/>
+                                    <AutoCompleteComp label='Area Name' value_list={cus_areas} label_field={'area_name'} value_field={'area_id'} value={area_id} onComboValueChange = {onAreaChange} required={true} error={area_idErr}/>
                                 </Grid>
                                 <Grid item xs={2}>
                                     <Button onClick={toggleAreaModal} color="primary" size='small' className={classes.area_btn} startIcon={<AddIcon />}>Add New Area</Button>
@@ -161,9 +178,15 @@ const CustomerEntry = ({selected_customer, openCustomerModal, toggleCustomerModa
                             <TextField type='email' value={email} onChange={e=>setEmail(e.target.value)} label="Email" fullWidth variant="outlined" className={classes.field} size="small"/>
                             
                             {(action==='Add New') &&
-                            <TextField type='number' value={mkt_amount} onChange={e=>setMkt_amount(e.target.value)} label="Due Amount" fullWidth variant="outlined" className={classes.field} size="small"/>}
+                            <>
+                            <TextField type='number' value={mkt_amount} onChange={e=>setMkt_amount(e.target.value)} label="Due Amount" fullWidth variant="outlined" className={classes.field} size="small"/>
+                             <TextField type="date"  value={mkt_pay_date} onChange={(e) =>{ setMkt_pay_date(e.target.value); setMktPayDateErr(false);} } required 
+                           label="Marketing/Payment Date (dd/mm/yyyy)" variant="outlined" className={classes.field} fullWidth  InputLabelProps={{ shrink: true, }} size="small"  error={mktPayDateErr}/>
+                                </>
+                                }
 
                             <TextField value={comments} onChange={e=>setComments(e.target.value)} label="Comments" fullWidth variant="outlined" className={classes.field} multiline rows={2} size="small"/>
+                          
                             <Button type="submit" variant="contained" color="primary" size="small">{action}</Button>
                             {(action === 'Add New') && <Button type="reset" variant="contained" size="small" className={classes.btn}>Reset</Button>}
                             {(action === 'Update') && <Button onClick={toggleCustomerModal} variant="contained" size="small" className={classes.btn}>Cancel</Button>}

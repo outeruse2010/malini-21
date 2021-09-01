@@ -1,14 +1,16 @@
 import React, {useState, useEffect, useMemo} from 'react';
 import Grid from '@material-ui/core/Grid';
 import {useRecoilState, useRecoilValue} from 'recoil';
-import { cus_dashboard_atom , fetch_customer_dashboard_data} from './dashboard_api';
-import { useStyles } from './chart_utils';
+import {  fetch_customer_dashboard_data} from './dashboard_api';
+import { useStyles, CustomMixBarChart, DasboardDataGrid } from './chart_utils';
 import ChartDataTable from './chart_data_table';
+import { DataGrid } from '@material-ui/data-grid';
+
 
 const CustomerDetail = () => {
     const classes = useStyles();
    
-    const [cus_data_list, setCus_data_list] = useRecoilState(cus_dashboard_atom);
+    const [cus_data_list, setCus_data_list] = useState([]);
 
     useEffect(() => {
         const cus_data_res = fetch_customer_dashboard_data();
@@ -17,20 +19,22 @@ const CustomerDetail = () => {
 
     // console.log('****cus_data_list: ',cus_data_list);
 
-    const cols = [{'field': 'area_name', name:'Area'}
-                        ,{'field': 'no_of_customers', name:'No of customers'}
-                        ,{'field': 'total_maketing', name:'Marketing Amt'}
-                        ,{'field': 'total_due', name:'Due Amt'}];
+    const cols = [{field: 'area_name', headerName:'Area', width:100,  align:'left', headerAlign: "left" }
+                        ,{field: 'no_of_customers', headerName:'Customers', width:100,   align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_maketing', headerName:'Marketing Amt', width:110,   align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_due', headerName:'Due Amt', width:110,   align:'left', headerAlign: "left",  type: 'number'}];
 
     return (
       <div className={classes.root}>
-        <Grid container spacing={4}  className={classes.grid_row} >
-                <Grid item xs={7}> 
-                    {/* <CustomLineChart data = {sale_expense_list} yfield1={'cash_sale_amount'} ylabel1={'Sale'} 
-                    yfield2={'expense_amt'} ylabel2={'Expense'} xfield={'sale_expense_date_str'}/> */}
+        <Grid container spacing={4} >
+                <Grid item xs={9}> 
+                    <CustomMixBarChart title='Areawise Marketing & Due' data = {cus_data_list} barLabel1={'no_of_customers'}   yfield2={'total_maketing'} ylabel2={'Marketing Amt'}  yfield3={'total_due'} ylabel3={'Due Amt'} xfield={'area_name'}/>
                  </Grid>
-                <Grid item xs={5}>
-                       <ChartDataTable rows = {cus_data_list} columns={cols}/>
+                <Grid item xs={3}>
+                <DasboardDataGrid rows={cus_data_list} columns={cols} title='Areawise Marketing & Due'/>
+                       {/* <div style={{ height: 300, width: '100%' }}>
+                          <DataGrid rows={cus_data_list} columns={cols}  hideFooterPagination={true} disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
+                      </div> */}
                 </Grid>
         </Grid>
       </div>

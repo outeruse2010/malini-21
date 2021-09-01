@@ -204,6 +204,11 @@ def fetch_daily_sale_expenses():
     res = perform_request(input, 'fetch_daily_sale_expenses',VIEW_ROLE, daily_sale_expenses)
     return res
 
+@app.route("/sale_expense_dashboard_data",  methods=['POST'])
+def fetch_sale_expense_dashboard_data():
+    input = request.get_json()
+    res = perform_request(input, 'sale_expense_dashboard_data',VIEW_ROLE, sale_expense_dashboard_data)
+    return res
 
 @app.route("/new_daily_sale_expense",  methods=['POST'])
 def add_new_daily_sale_expense():

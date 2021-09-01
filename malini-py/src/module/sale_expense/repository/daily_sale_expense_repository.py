@@ -27,6 +27,34 @@ def daily_sale_expenses(input={}):
     rs_json = df.to_json(orient="records")
     return rs_json
 
+def sale_expense_dashboard_data(input={}):
+    log.info('find sale_expense_dashboard_data....')
+    engine = db_engine()
+    last_30_days_sql = f''' SELECT cast(sale_expense_id as varchar) id,to_char(sale_expense_date,'DD-Mon') sale_expense_date_str,
+                       cash_sale_amount, expense_amt, sale_expense_date
+                        FROM {DB_SCHEMA}.daily_sale_expense where deleted = 'N' 
+                        and sale_expense_date >= (sale_expense_date -30) order by sale_expense_date desc'''
+    last_30_df = pd.read_sql(con=engine, sql=last_30_days_sql)
+    daily = last_30_df.to_dict(orient="records")
+
+    weekly_sql = f''' SELECT extract(week from sale_expense_date) id, sum(cash_sale_amount) total_cash_sale, sum(expense_amt) total_expense                        
+                        FROM {DB_SCHEMA}.daily_sale_expense
+                        where sale_expense_date > (sale_expense_date - 31)
+                        group by extract(week from sale_expense_date)
+                        order by extract(week from sale_expense_date) '''
+    weekly_df = pd.read_sql(con=engine, sql=weekly_sql)
+    weekly = weekly_df.to_dict(orient="records")
+
+    monthly_sql = f''' SELECT extract(month from sale_expense_date) id, sum(cash_sale_amount) total_cash_sale, sum(expense_amt) total_expense                        
+                            FROM {DB_SCHEMA}.daily_sale_expense
+                            where sale_expense_date > (sale_expense_date - 190)
+                            group by extract(month from sale_expense_date)
+                            order by extract(month from sale_expense_date) '''
+    monthly_df = pd.read_sql(con=engine, sql=monthly_sql)
+    monthly = monthly_df.to_dict(orient="records")
+
+    rs_json = {'daily': daily, 'weekly':weekly, 'monthly':monthly }
+    return rs_json
 
 def add_daily_sale_expense(exp_sale_json):
     log.info(f'add_daily_sale_expense....{exp_sale_json}')
