@@ -14,7 +14,7 @@ const SaleExpense = () => {
     const user_name = login_data.user_name;
 
     const [act_message, setAct_message] = useRecoilState(message_atom);
-    const [last_30_days, setLast_30_days] = useState([]);
+    const [last_15_days, setLast_15_days] = useState([]);
     const [weekly, setWeekly] = useState([]);
     const [monthly, setMonthly] = useState([]);
     
@@ -25,7 +25,7 @@ const SaleExpense = () => {
             if(data['status'] === 'error'){
                 setAct_message(sale_exp_res);
             }else {                
-                setLast_30_days(data['daily']);
+                setLast_15_days(data['daily']);
                 setWeekly(data['weekly']);
                 setMonthly(data['monthly']);
             }
@@ -44,12 +44,11 @@ const SaleExpense = () => {
                         ,{field: 'total_expense', headerName:'Expense', width:110, align:'left', headerAlign: "left",  type: 'number'}];
 
     return (
-      <div className={classes.root}>
-        <Grid container spacing={4} >
+        <Grid container>
                 <Grid item xs={9}> 
                     <Grid container   spacing={2} >
                             <Grid item >                                 
-                                <CustomLineChart title='Last 30 Days Sale Expense'  data = {last_30_days} yfield1={'cash_sale_amount'} ylabel1={'Sale'}  yfield2={'expense_amt'} ylabel2={'Expense'} xfield={'sale_expense_date_str'}/>
+                                <CustomLineChart title='Last 15 Days Sale Expense'  data = {last_15_days} yfield1={'cash_sale_amount'} ylabel1={'Sale'}  yfield2={'expense_amt'} ylabel2={'Expense'} xfield={'sale_expense_date_str'}/>
                             </Grid>
                              <Grid item > 
                                     <CustomBarChart title='Last 4 Weeks  Sale Expense' data = {weekly}   yfield2={'total_cash_sale'} ylabel2={'Cash Sale'}  yfield3={'total_expense'} ylabel3={'Expend'} xfield={'id'}/>
@@ -60,12 +59,11 @@ const SaleExpense = () => {
                         </Grid>
                  </Grid>
                 <Grid item xs={3}>
-                       <DasboardDataGrid rows={last_30_days} columns={daily_cols} title='Last 30 days sale expense'/>
+                       <DasboardDataGrid rows={last_15_days} columns={daily_cols} title='Last 15 days sale expense'/>
                         <DasboardDataGrid rows={weekly} columns={weekly_cols} title='Last 4 weeks sale expense'/>
                         <DasboardDataGrid rows={monthly} columns={monthly_cols} title='Last 6 months sale expense'/>                
                 </Grid>
         </Grid>
-      </div>
     )
 };
 

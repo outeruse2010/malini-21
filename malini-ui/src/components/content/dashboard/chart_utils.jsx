@@ -9,7 +9,7 @@ export const DasboardDataGrid = ({rows, columns, title}) =>{
   const classes = useStyles();
   return (
         <div style={{ width: '100%'}}>
-           <Typography className={classes.title} color="textPrimary"> {title} </Typography>
+           <Typography className={classes.title} > {title} </Typography>
             <DataGrid rows={rows} columns={columns} autoHeight={true} hideFooterPagination={true} disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={20} headerHeight={22}/>
         </div>
   );
@@ -28,7 +28,7 @@ export const CustomLineChart = ({ title, data, yfield1, ylabel1, yfield2, ylabel
   const classes = useStyles();
   return (
           <Card variant="outlined">
-              <Typography className={classes.title} color={blue_color}> {title} </Typography>
+              <Typography className={classes.title}> {title} </Typography>
               <LineChart data={data}  margin={chart_margin} width={chart_width}  height={chart_height}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey={xfield} style={axis_font}/>
@@ -50,7 +50,7 @@ export const CustomAreaChart = ({ title, data, yfield1, ylabel1, yfield2, ylabel
   const classes = useStyles();
   return (
     <Card variant="outlined">
-    <Typography className={classes.title} color={blue_color}> {title} </Typography>
+    <Typography className={classes.title} > {title} </Typography>
     <AreaChart width={chart_width} height={chart_height} data={data}
     margin={chart_margin}>
     <defs>
@@ -80,7 +80,7 @@ export const CustomMixBarChart = ({title, data, barLabel1, yfield2, ylabel2,  yf
   const classes = useStyles();
       return (
         <Card variant="outlined">
-            <Typography className={classes.title} color={blue_color}> {title} </Typography>
+            <Typography className={classes.title} > {title} </Typography>
                  <BarChart data={data}  margin={chart_margin} width={chart_width}  height={chart_height}>
                           <CartesianGrid strokeDasharray="3 3" />
                               <XAxis dataKey={xfield} style={axis_font}/>
@@ -100,7 +100,7 @@ export const CustomBarChart = ({title,data,  yfield2, ylabel2,  yfield3, ylabel3
   const classes = useStyles();
   return (
     <Card variant="outlined">
-            <Typography className={classes.title} color={blue_color}> {title} </Typography>
+            <Typography className={classes.title} > {title} </Typography>
              <BarChart data={data}  margin={chart_margin}  width={chart_width}  height={chart_height}>
                       <CartesianGrid strokeDasharray="3 3" />
                           <XAxis dataKey={xfield} style={axis_font}/>
@@ -174,7 +174,7 @@ const customBarLabel = (props) => {
 
       return (
           <Card variant="outlined">
-                <Typography className={classes.title} color={blue_color}> {title} </Typography>
+                <Typography className={classes.title} > {title} </Typography>
                 <PieChart width={chart_width} height={chart_height}>
                           <Pie activeIndex={activeIndex}
                               activeShape={renderActiveShape}
@@ -196,7 +196,9 @@ export const useStyles = makeStyles((theme) => ({
     
     title: {
       fontSize: 14,
-      textAlign: 'center'
+      textAlign: 'center',
+      fontColor:"#1a237e",
+      fontFamily: 'Comic Sans MS'
     }
   }));
 

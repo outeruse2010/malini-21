@@ -15,13 +15,12 @@ const CustomerDetail = () => {
     }, []);
 
     const cols = [{field: 'area_name', headerName:'Area', width:100,  align:'left', headerAlign: "left" }
-                        ,{field: 'no_of_customers', headerName:'Customers', width:100,   align:'left', headerAlign: "left",  type: 'number'}
-                        ,{field: 'total_maketing', headerName:'Marketing Amt', width:110,   align:'left', headerAlign: "left",  type: 'number'}
-                        ,{field: 'total_due', headerName:'Due Amt', width:110,   align:'left', headerAlign: "left",  type: 'number'}];
+                        ,{field: 'no_of_customers', headerName:'Customers', width:85,   align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_maketing', headerName:'Marketing', width:90,   align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_due', headerName:'Due', width:90,   align:'left', headerAlign: "left",  type: 'number'}];
 
     return (
-      <div className={classes.root}>
-        <Grid container spacing={4} >
+        <Grid container >
                 <Grid item xs={9}> 
                 <Grid container   spacing={2} >
                        <Grid item > 
@@ -38,7 +37,6 @@ const CustomerDetail = () => {
                         <DasboardDataGrid rows={cus_data_list} columns={cols} title='Areawise Marketing & Due'/>
                 </Grid>
         </Grid>
-      </div>
     )
 };
 
