@@ -20,7 +20,7 @@ def daily_sale_expenses(input={}):
                 se.cash_sale_amount, se.expense_amt, se.sale_expense_date, to_char(se.sale_expense_date,'DD-Mon-YYYY') sale_expense_date_str,
                 se."comments", se.created_on, se.created_by, se.updated_on, se.updated_by, se.deleted
                 FROM {DB_SCHEMA}.daily_sale_expense se, {DB_SCHEMA}.expense_type e
-                where se.expense_type_id = e.expense_type_id and se.deleted = 'N' order by created_on desc '''
+                where se.expense_type_id = e.expense_type_id and se.deleted = 'N' order by se.sale_expense_date desc '''
 
     df = pd.read_sql(con=engine, sql=sql)
     log.info(f'daily_sale_expenses no of rows selected : {df.shape[0]}')
@@ -30,10 +30,10 @@ def daily_sale_expenses(input={}):
 def sale_expense_dashboard_data(input={}):
     log.info('find sale_expense_dashboard_data....')
     engine = db_engine()
-    last_30_days_sql = f''' SELECT cast(sale_expense_id as varchar) id,to_char(sale_expense_date,'DD-Mon') sale_expense_date_str,
-                       cash_sale_amount, expense_amt, sale_expense_date
+    last_30_days_sql = f''' SELECT sale_expense_date id,sale_expense_date, to_char(sale_expense_date,'DD-Mon') sale_expense_date_str,
+                       sum(cash_sale_amount) cash_sale_amount, sum(expense_amt) expense_amt
                         FROM {DB_SCHEMA}.daily_sale_expense where deleted = 'N' 
-                        and sale_expense_date >= (sale_expense_date -15) order by sale_expense_date desc'''
+                        and sale_expense_date >= (sale_expense_date -15) group by sale_expense_date order by sale_expense_date desc'''
     last_30_df = pd.read_sql(con=engine, sql=last_30_days_sql)
     daily = last_30_df.to_dict(orient="records")
 
@@ -61,7 +61,17 @@ def add_daily_sale_expense(exp_sale_json):
     msg = f'''daily sale expense added !!! '''
     msg_json = {}
     try:
-        df = pd.DataFrame([exp_sale_json])
+        expense_arr = exp_sale_json['expense_arr']
+        exp_rows = []
+        for each_exp in expense_arr:
+            exp_rows.append({'cash_sale_amount': exp_sale_json['cash_sale_amount'],
+                             'sale_expense_date': exp_sale_json['sale_expense_date'],
+                             'comments': exp_sale_json['comments'],
+                             'created_by': exp_sale_json['created_by'],
+                             'expense_type_id': each_exp['expense_type_id'],
+                             'expense_amt': each_exp['expense_amt']})
+
+        df = pd.DataFrame(exp_rows)
         engine = db_engine()
         df.to_sql('daily_sale_expense', con=engine, schema=DB_SCHEMA, if_exists='append', index=False)
         msg_json['status'] = SUCCESS

@@ -103,12 +103,12 @@ const DailySaleExpense = () => {
     }
 
     const columns = [
-        { field: "sale_expense_id", headerName: "Edit", renderCell: renderEditButton ,  width: 105, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: "", headerName: "Delete", renderCell: renderDeleteButton,  width: 120, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: 'expense_name', headerName: 'Expense', width: 180, headerClassName: appcls.data_grid_header}
-        ,{ field: 'cash_sale_amount', headerName: 'Cash Sale', width: 180, headerClassName: appcls.data_grid_header}
-        ,{ field: 'expense_amt', headerName: 'Expense', width: 180, headerClassName: appcls.data_grid_header},
+        { field: "sale_expense_id", headerName: "Edit", renderCell: renderEditButton ,  width: 90, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
+        ,{ field: "", headerName: "Delete", renderCell: renderDeleteButton,  width: 95, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
         ,{ field: 'sale_expense_date', headerName: 'Sale/Exp Date', width: 160, valueGetter: gridDate, headerClassName: appcls.data_grid_header}
+        ,{ field: 'cash_sale_amount', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header}
+        ,{ field: 'expense_name', headerName: 'Exp Type', width: 150, headerClassName: appcls.data_grid_header}
+        ,{ field: 'expense_amt', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header}
         ,{ field: 'comments', headerName: 'Comments', width: 300, headerClassName: appcls.data_grid_header}
         ,{ field: 'created_by', headerName: 'Created By', width: 200, headerClassName: appcls.data_grid_header}
         ,{ field: 'created_on', headerName: 'Created On', width: 160, valueGetter: gridDateTime, headerClassName: appcls.data_grid_header}
