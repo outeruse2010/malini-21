@@ -63,8 +63,11 @@ def add_daily_sale_expense(exp_sale_json):
     try:
         expense_arr = exp_sale_json['expense_arr']
         exp_rows = []
+        count = 0
         for each_exp in expense_arr:
-            exp_rows.append({'cash_sale_amount': exp_sale_json['cash_sale_amount'],
+            cash_sale_amount = 0 if count > 0 else exp_sale_json['cash_sale_amount']
+            count = count + 1
+            exp_rows.append({'cash_sale_amount': cash_sale_amount,
                              'sale_expense_date': exp_sale_json['sale_expense_date'],
                              'comments': exp_sale_json['comments'],
                              'created_by': exp_sale_json['created_by'],

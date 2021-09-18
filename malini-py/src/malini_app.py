@@ -245,7 +245,7 @@ def perform_request(input, api_name, roles, callback_fun, comments=''):
     user_id = input["user_id"]
     user_name = input["user_name"]
     if not user_id:
-        log.info(f'User not logged in !!! Input: {input}')
+        # log.info(f'User not logged in !!! Input: {input}')
         return {'status': ERROR, 'message': 'User not logged in !!!'}
     res = {}
     status = SUCCESS
