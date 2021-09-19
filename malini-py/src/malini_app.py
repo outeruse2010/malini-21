@@ -231,6 +231,68 @@ def remove_daily_sale_expense():
     return res
 
 
+# =============== daily sale detail     =====================
+
+from src.module.sale_expense.repository.daily_sale_repository import *
+
+@app.route("/fetch_daily_sales",  methods=['POST'])
+def find_daily_sales():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_daily_sales',VIEW_ROLE, fetch_daily_sales)
+    return res
+
+@app.route("/new_daily_sale",  methods=['POST'])
+def add_new_daily_sale():
+    input = request.get_json()
+    res = perform_request(input, 'add_daily_sales',ACTION_ROLE, add_daily_sales)
+    return res
+
+
+@app.route("/update_daily_sales",  methods=['POST'])
+def update_existing_daily_sale():
+    input = request.get_json()
+    res = perform_request(input, 'update_daily_sales',ACTION_ROLE, update_daily_sales)
+    return res
+
+
+@app.route("/remove_daily_sale", methods=['POST'])
+def remove_daily_sale():
+    input = request.get_json()
+    res = perform_request(input, 'remove_daily_sale',ACTION_ROLE, delete_daily_sales)
+    return res
+
+
+# =============== daily expense detail     =====================
+
+from src.module.sale_expense.repository.daily_expense_repository import *
+
+@app.route("/fetch_daily_expenses",  methods=['POST'])
+def find_daily_expenses():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_daily_expenses',VIEW_ROLE, fetch_daily_expenses)
+    return res
+
+@app.route("/add_daily_expenses",  methods=['POST'])
+def add_new_daily_expense():
+    input = request.get_json()
+    res = perform_request(input, 'add_daily_expenses',ACTION_ROLE, add_daily_expenses)
+    return res
+
+
+@app.route("/update_daily_expense",  methods=['POST'])
+def update_existing_daily_expense():
+    input = request.get_json()
+    res = perform_request(input, 'update_daily_expense',ACTION_ROLE, update_daily_expenses)
+    return res
+
+
+@app.route("/remove_daily_expense", methods=['POST'])
+def remove_daily_expense():
+    input = request.get_json()
+    res = perform_request(input, 'remove_daily_expense',ACTION_ROLE, delete_daily_expenses)
+    return res
+
+
 # ***********************user activity *********************
 
 def check_authentication(input, roles):

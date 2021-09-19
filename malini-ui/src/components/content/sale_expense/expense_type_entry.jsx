@@ -24,9 +24,11 @@ const ExpenseTypeEntry = ({selected_expense_type, openExpenseTypeModal, toggleEx
 
     const action = selected_expense_type ? 'Update' : 'Add New';
 
+    const [exp_type, setExp_type] = useState('');
     const [expense_name, setExpense_name] = useState('');
     const [comments, setComments] = useState('');
     const [expenseNameErr, setExpenseNameErr] = useState(false);
+    const [expTypeErr, setExpTypeErr] = useState(false);
     const [act_expense_type_res, setAct_expense_type_res] = useRecoilState(act_expense_type_atom);
     const [expense_type_list, setExpense_type_list] = useRecoilState(expense_type_atom);
     const [act_message, setAct_message] = useRecoilState(message_atom);
@@ -43,6 +45,7 @@ const ExpenseTypeEntry = ({selected_expense_type, openExpenseTypeModal, toggleEx
     
     const onReset = () => {
         setExpense_name('');
+        setExp_type('');
         setComments('');
     }
 
@@ -52,11 +55,15 @@ const ExpenseTypeEntry = ({selected_expense_type, openExpenseTypeModal, toggleEx
             setExpenseNameErr(true);
             return;
         }
+        if(!exp_type){
+            setExp_type(true);
+            return;
+        }
         
-        let input = {expense_name, comments};
+        let input = {exp_type,expense_name, comments};
         const do_update = (action === 'Update');
         if(do_update) {
-            input = {expense_name, comments, 'updated_by': user_name, 'expense_type_id': selected_expense_type['expense_type_id']};
+            input = {exp_type,expense_name, comments, 'updated_by': user_name, 'expense_type_id': selected_expense_type['expense_type_id']};
         }else{
             input['created_by'] = user_name; 
         }
@@ -86,6 +93,7 @@ const ExpenseTypeEntry = ({selected_expense_type, openExpenseTypeModal, toggleEx
 
                         <form onSubmit={onSubmit} onReset={onReset} noValidate autoComplete="off">
                             <TextField value={expense_name} onChange={e=>{setExpense_name(e.target.value);setExpenseNameErr(false);}} error={expenseNameErr} label="Expense Name" fullWidth variant="outlined" required className={classes.field}  size="small"/>
+                            <TextField value={exp_type} onChange={e=>{setExp_type(e.target.value);setExpTypeErr(false);}} error={expTypeErr} label="Expense Type" fullWidth variant="outlined" required className={classes.field}  size="small"/>
                             <TextField value={comments} onChange={e=>{setComments(e.target.value);}} label="Description" multiline rows={3} fullWidth variant="outlined" className={classes.field} size="small"/> 
                             <Button type="submit" variant="contained" color="primary" size="small">{action}</Button>
                             {(action === 'Add New') && <Button type="reset" variant="contained" size="small" className={classes.btn}>Reset</Button>}

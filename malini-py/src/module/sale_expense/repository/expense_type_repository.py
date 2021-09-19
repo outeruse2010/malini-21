@@ -16,8 +16,8 @@ from src.constants.app_const import *
 def expense_types(input={}):
     log.info('find expense_types....')
     engine = db_engine()
-    sql = f''' SELECT cast(expense_type_id as varchar) expense_type_id,cast(expense_type_id as varchar) id, expense_name, 
-               "comments", created_on, created_by, updated_on, updated_by, deleted
+    sql = f''' SELECT cast(expense_type_id as varchar) expense_type_id,cast(expense_type_id as varchar) id,
+                exp_type, expense_name, "comments", created_on, created_by, updated_on, updated_by, deleted
                FROM {DB_SCHEMA}.expense_type
                where deleted = 'N' order by created_on desc '''
     df = pd.read_sql(con=engine, sql=sql)
@@ -48,7 +48,7 @@ def update_expense_type(expense_type_json):
     expense_type_id = expense_type_json['expense_type_id']
     expense_name = expense_type_json['expense_name']
     log.info(f'update_expense_type for expense_type_id: {expense_type_id}')
-    sql = f''' UPDATE {DB_SCHEMA}.expense_type set expense_name = '{expense_name}', 
+    sql = f''' UPDATE {DB_SCHEMA}.expense_type set expense_name = '{expense_name}', exp_type = '{expense_type_json['exp_type']}',
                comments = '{expense_type_json['comments']}', updated_by = '{expense_type_json['updated_by']}',
                updated_on = now() where expense_type_id = '{expense_type_id}' '''
     msg = f'''expense name [{expense_name}] updated !!! '''

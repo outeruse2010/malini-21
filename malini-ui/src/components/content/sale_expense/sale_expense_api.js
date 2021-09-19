@@ -55,3 +55,61 @@ export const delete_daily_sale_expense = async (input) => {
     const data = res.json();   
     return data;
 }
+
+
+/****************Daily sale  detail ***********/
+
+export const sale_atom = atom({key: "sale_atom", default: []});
+export const act_sale_atom = atom({key: "act_sale_atom", default: {} });
+
+export const fetch_daily_sales = async (input = {}) => {
+    const req = post_request('fetch_daily_sales', input);
+    const res = await fetch(req);
+    const data = res.json();    
+    return data;
+};
+
+export const add_update_daily_sale = async (input) => {
+    const api = input['sale_id'] ? 'update_daily_sales' : 'new_daily_sale';
+    const req = post_request(api, input);
+    const res = await fetch(req);
+    const data = res.json();   
+    return data;
+}
+
+export const delete_daily_sale = async (input) => {
+    const api = 'remove_daily_sale';
+    const req = post_request(api, input);
+    const res = await fetch(req);
+    const data = res.json();   
+    return data;
+}
+
+
+/****************Daily  expense detail ***********/
+
+export const expense_atom = atom({key: "expense_atom", default: []});
+export const act_expense_atom = atom({key: "act_expense_atom", default: {} });
+
+export const fetch_daily_expenses = async (input = {}) => {
+    const req = post_request('fetch_daily_expenses', input);
+    const res = await fetch(req);
+    const data = res.json();    
+    return data;
+};
+
+export const add_update_daily_expense = async (input) => {
+    const api = input['expense_id'] ? 'update_daily_expense' : 'add_daily_expenses';
+    const req = post_request(api, input);
+    const res = await fetch(req);
+    const data = res.json();   
+    return data;
+}
+
+export const delete_daily_expense = async (input) => {
+    const api = 'remove_daily_expense';
+    const req = post_request(api, input);
+    const res = await fetch(req);
+    const data = res.json();   
+    return data;
+}

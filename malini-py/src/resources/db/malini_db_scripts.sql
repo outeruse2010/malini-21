@@ -140,6 +140,7 @@ CREATE TABLE malini_schema.cus_due(
 
 CREATE TABLE malini_schema.expense_type(
    expense_type_id uuid  DEFAULT uuid_generate_v4(),
+   exp_type text,
    expense_name text,
    comments text,
    created_on timestamp default now(),
@@ -149,6 +150,38 @@ CREATE TABLE malini_schema.expense_type(
    deleted char(1) default 'N',
    PRIMARY KEY(expense_type_id)
 );
+
+--drop TABLE malini_schema.daily_sales;
+
+CREATE TABLE malini_schema.daily_sales(
+   sale_id uuid  DEFAULT uuid_generate_v4(),
+   cash_sale_amount decimal DEFAULT 0,
+   sale_date date,
+   comments text,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(sale_id)
+);
+
+--drop TABLE malini_schema.daily_expenses;
+
+CREATE TABLE malini_schema.daily_expenses(
+   expense_id uuid  DEFAULT uuid_generate_v4(),
+   expense_type_id uuid not null,
+   expense_amt decimal DEFAULT 0,
+   expense_date date,
+   comments text,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(expense_id)
+);
+
 
 --drop TABLE malini_schema.daily_sale_expense;
 

@@ -15,6 +15,8 @@ import MenuDrawer from './menu_drawer';
 import {drawerWidth} from './menu_const';
 import ExpenseTypes from '../content/sale_expense/expense_types';
 import DailySaleExpense from '../content/sale_expense/daily_sale_expense';
+import DailySales from '../content/sale_expense/daily_sales';
+import DailyExpenses from '../content/sale_expense/daily_expenses';
 import DashBoard from './../content/dashboard/dash_board';
 
 const menu_items = [  
@@ -23,6 +25,8 @@ const menu_items = [
   ,{"title": "Customers","component": Customers, "path": "/customers", "icon": "", "divide": false}
   ,{"title": "Expense Types","component": ExpenseTypes, "path": "/expense_types", "icon": "", "divide": false}
   ,{"title": "Daily Sale Expense","component": DailySaleExpense, "path": "/daily_sale_expense", "icon": "", "divide": false}
+  ,{"title": "Daily Sales","component": DailySales, "path": "/daily_sales", "icon": "", "divide": false}
+  ,{"title": "Daily Expenses","component": DailyExpenses, "path": "/daily_expenses", "icon": "", "divide": false}
                     ];
 
 function AppMenu() {
