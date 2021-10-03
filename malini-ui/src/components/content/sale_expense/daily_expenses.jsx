@@ -125,7 +125,7 @@ const DailyExpenses = () => {
             </Grid>
 
             <div style={{ height: 500, width: '100%' }}>
-                <DataGrid rows={expense_list} columns={columns}   disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
+                <DataGrid showBorders={true} rows={expense_list} columns={columns}   disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
             </div>
 
             <DailyExpenseEntry selected_expense={selected_expense} openExpenseModal={openExpenseModal} toggleExpenseModal={toggleExpenseModal} />

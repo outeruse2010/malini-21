@@ -1,8 +1,7 @@
 import React, {useState, useEffect, useMemo} from 'react';
 import { DataGrid } from '@material-ui/data-grid';
-import {Button, IconButton, Tooltip, Typography, Grid}  from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
+import {Button, Typography, Grid}  from '@material-ui/core';
+
 import AddIcon from '@material-ui/icons/Add';
 import {login_atom} from '../login/login_api';
 import {useRecoilState, useRecoilValue} from 'recoil';
@@ -52,18 +51,6 @@ const DailySaleExpense = () => {
         toggleSaleExpenseModal();
     }
 
-    const onDeleteClick = (row) => {
-        setSelected_sale_expense(row);
-        let title = 'Delete Sale Expense';
-        let content = 'Are you sure to DELETE sale expense type ?';
-        setDialog_message({title, content});
-        setOpenDia(true);
-    };
-
-    const onEditClick = (row) => {
-        setSelected_sale_expense(row);
-        setOpenSaleExpenseModal(true);
-    };
 
     const onDialogClose = (ans) => {
         if(ans === 'Y'){
@@ -85,36 +72,14 @@ const DailySaleExpense = () => {
         setOpenDia(false);
     };
     
-    
-    const renderEditButton = (params) => {
-        return (            
-            <IconButton onClick={() => {onEditClick(params.row);}}>
-                <Tooltip title="Edit" arrow><EditIcon fontSize="small" color='primary'/></Tooltip>
-            </IconButton>
-        );
-    }
-
-    const renderDeleteButton = (params) => {
-        return (            
-            <IconButton onClick={() => {onDeleteClick(params.row) }}>
-                <Tooltip title="Delete" arrow><DeleteIcon fontSize="small"  color='secondary'/></Tooltip>
-            </IconButton>
-        );
-    }
 
     const columns = [
-        { field: "sale_expense_id", headerName: "Edit", renderCell: renderEditButton ,  width: 90, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: "", headerName: "Delete", renderCell: renderDeleteButton,  width: 95, disableColumnMenu:true, headerClassName: appcls.data_grid_header}
-        ,{ field: 'sale_expense_date', headerName: 'Sale/Exp Date', width: 160, valueGetter: gridDate, headerClassName: appcls.data_grid_header}
-        ,{ field: 'cash_sale_amount', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header}
-        ,{ field: 'expense_name', headerName: 'Exp Type', width: 150, headerClassName: appcls.data_grid_header}
-        ,{ field: 'expense_amt', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header}
-        ,{ field: 'comments', headerName: 'Comments', width: 300, headerClassName: appcls.data_grid_header}
+        { field: 'sale_exp_date', headerName: 'Sale/Exp Date', width: 160, valueGetter: gridDate, headerClassName: appcls.data_grid_header, type:'date'}
+        ,{ field: 'total_cash_sale', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header}
+        ,{ field: 'total_expense', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header}
         ,{ field: 'created_by', headerName: 'Created By', width: 200, headerClassName: appcls.data_grid_header}
         ,{ field: 'created_on', headerName: 'Created On', width: 160, valueGetter: gridDateTime, headerClassName: appcls.data_grid_header}
-        ,{ field: 'updated_by', headerName: 'Updated By', width: 200, headerClassName: appcls.data_grid_header}
-        ,{ field: 'updated_on', headerName: 'Updated On', width: 160, valueGetter: gridDateTime, headerClassName: appcls.data_grid_header}
-        ];
+      ];
 
     const dialog_memo = useMemo(()=> <DialogComp show={openDia} onDialogClose={(ans)=> onDialogClose(ans)}/>, [openDia]);
 

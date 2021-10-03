@@ -217,19 +217,6 @@ def add_new_daily_sale_expense():
     return res
 
 
-@app.route("/update_daily_sale_expense",  methods=['POST'])
-def update_existing_daily_sale_expense():
-    input = request.get_json()
-    res = perform_request(input, 'update_daily_sale_expense',ACTION_ROLE, update_daily_sale_expense)
-    return res
-
-
-@app.route("/remove_daily_sale_expense", methods=['POST'])
-def remove_daily_sale_expense():
-    input = request.get_json()
-    res = perform_request(input, 'remove_daily_sale_expense',ACTION_ROLE, delete_daily_sale_expense)
-    return res
-
 
 # =============== daily sale detail     =====================
 

@@ -50,6 +50,9 @@ const DailySaleExpenseEntry = ({selected_sale_expense, openSaleExpenseModal, tog
 
     const [saleExpenseDateErr, setSaleExpenseDateErr] = useState(false);
 
+    const [expAmtErr, setExpAmtErr] = useState(false);
+    const [expBtnColor, setExpBtnColor] = useState("primary");
+
     const [sale_expense_res, setAct_sale_expense_res] = useRecoilState(act_sale_expense_atom);
     const [sale_expense_list, setSale_expense_list] = useRecoilState(sale_expense_atom);
     const [expense_type_list, setExpense_type_list] = useRecoilState(expense_type_atom);
@@ -80,6 +83,8 @@ const DailySaleExpenseEntry = ({selected_sale_expense, openSaleExpenseModal, tog
             setExpense_name(selected_sale_expense.expense_name);
             setComments(selected_sale_expense.comments);
             setExpense_arr([]);
+            setExpBtnColor("primary");
+            setExpAmtErr(false);
         }
     }, [openSaleExpenseModal]);
 
@@ -91,6 +96,8 @@ const DailySaleExpenseEntry = ({selected_sale_expense, openSaleExpenseModal, tog
         setSale_expense_date(today);
         setComments('');
         setExpense_arr([]);
+        setExpBtnColor("primary");
+        setExpAmtErr(false);
     };
 
     const onSubmit = (e) => {
@@ -109,6 +116,16 @@ const DailySaleExpenseEntry = ({selected_sale_expense, openSaleExpenseModal, tog
         }else{
             input['expense_arr'] = expense_arr;
             input['created_by'] = user_name; 
+        }
+
+        if( expense_amt){
+            setExpBtnColor("secondary");
+            return;
+        }
+
+        if((expense_type_id && !expense_amt)  || (expense_arr.length === 0) ){
+            setExpAmtErr(true);
+            return;
         }
 
         const res = add_update_daily_sale_expense(input);
@@ -209,10 +226,10 @@ const expense_table = (expense_arr) => {
                            
                             <Grid container spacing={1}>
                                 <Grid item xs={(action === 'Add New') ? 10 : 12}>
-                                    <TextField type='number' disabled={!expense_type_id} value={expense_amt} onChange={e=>setExpense_amt(e.target.value)} label="Expend  Amount" fullWidth variant="outlined" className={classes.field} size="small"/>
+                                    <TextField type='number' disabled={!expense_type_id} value={expense_amt} onChange={e=>{setExpense_amt(e.target.value); setExpAmtErr('');}} label="Expend  Amount" fullWidth variant="outlined" error={(expAmtErr)}  className={classes.field} size="small"/>
                                 </Grid>
                                 {(action === 'Add New') && <Grid item xs={2}>
-                                    <Button disabled={!expense_amt} onClick={addExpenseRow} color="primary" size='small' className={classes.exp_btn} startIcon={<AddIcon />} startIcon={<AddIcon />}>Expense</Button>
+                                    <Button disabled={!expense_amt} onClick={addExpenseRow} color={expBtnColor} size='small' className={classes.exp_btn} startIcon={<AddIcon />} startIcon={<AddIcon />}>Expense</Button>
                                 </Grid>}
                             </Grid>
 

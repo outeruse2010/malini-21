@@ -7,126 +7,125 @@
 import traceback
 
 import pandas as pd
+import numpy as np
 
 from src.config.db_config import db_engine
 from src.config.log_config import log
 from src.constants.app_const import *
 
+
 def daily_sale_expenses(input={}):
     log.info('find daily_sale_expenses....')
     engine = db_engine()
-    sql = f''' SELECT cast(se.sale_expense_id as varchar) sale_expense_id, cast(se.sale_expense_id as varchar) id, 
-                cast(se.expense_type_id as varchar) expense_type_id, e.expense_name,
-                se.cash_sale_amount, se.expense_amt, se.sale_expense_date, to_char(se.sale_expense_date,'DD-Mon-YYYY') sale_expense_date_str,
-                se."comments", se.created_on, se.created_by, se.updated_on, se.updated_by, se.deleted
-                FROM {DB_SCHEMA}.daily_sale_expense se, {DB_SCHEMA}.expense_type e
-                where se.expense_type_id = e.expense_type_id and se.deleted = 'N' order by se.sale_expense_date desc '''
-
-    df = pd.read_sql(con=engine, sql=sql)
-    log.info(f'daily_sale_expenses no of rows selected : {df.shape[0]}')
+    # , to_char(sale_date,'DD-Mon-YYYY') sale_exp_date_str
+    sale_sql = f''' SELECT sale_date  sale_exp_date, sum(cash_sale_amount) total_cash_sale 
+                FROM {DB_SCHEMA}.daily_sales  where deleted = 'N' group by sale_date order by sale_date '''
+    sale_df = pd.read_sql(con=engine, sql=sale_sql)
+    log.info(f'No of Sale rows: {sale_df.shape[0]}')
+    # to_char(e.expense_date,'DD-Mon-YYYY') sale_exp_date_str,
+    exp_sql = f'''select e.expense_date sale_exp_date, sum(e.expense_amt) total_expense
+                FROM {DB_SCHEMA}.daily_expenses e where e.deleted = 'N'  group by e.expense_date order by e.expense_date '''
+    exp_df = pd.read_sql(con=engine, sql=exp_sql)
+    log.info(f'No of expense rows: {exp_df.shape[0]}')
+    df = get_sale_exp_df(sale_df, exp_df, 'sale_exp_date')
     rs_json = df.to_json(orient="records")
     return rs_json
 
+
+
 def sale_expense_dashboard_data(input={}):
     log.info('find sale_expense_dashboard_data....')
-    engine = db_engine()
-    last_30_days_sql = f''' SELECT sale_expense_date id,sale_expense_date, to_char(sale_expense_date,'DD-Mon') sale_expense_date_str,
-                       sum(cash_sale_amount) cash_sale_amount, sum(expense_amt) expense_amt
-                        FROM {DB_SCHEMA}.daily_sale_expense where deleted = 'N' 
-                        and sale_expense_date >= (sale_expense_date -15) group by sale_expense_date order by sale_expense_date desc'''
-    last_30_df = pd.read_sql(con=engine, sql=last_30_days_sql)
-    daily = last_30_df.to_dict(orient="records")
 
-    weekly_sql = f''' SELECT extract(week from sale_expense_date) id, sum(cash_sale_amount) total_cash_sale, sum(expense_amt) total_expense                        
-                        FROM {DB_SCHEMA}.daily_sale_expense
-                        where sale_expense_date > (sale_expense_date - 31)
-                        group by extract(week from sale_expense_date)
-                        order by extract(week from sale_expense_date) '''
-    weekly_df = pd.read_sql(con=engine, sql=weekly_sql)
+    engine = db_engine()
+
+    last_15_days_sale_sql = f''' SELECT to_char(sale_date,'DD-Mon-YYYY') sale_exp_date_str, sum(cash_sale_amount) total_cash_sale 
+                    FROM {DB_SCHEMA}.daily_sales  
+                    where deleted = 'N' and sale_date >= (sale_date -15)
+                    group by sale_date order by sale_date '''
+    last_15_days_sale_df = pd.read_sql(con=engine, sql=last_15_days_sale_sql)
+
+    last_15_days_exp_sql = f'''select to_char(expense_date,'DD-Mon-YYYY') sale_exp_date_str, sum(expense_amt) total_expense
+                    FROM {DB_SCHEMA}.daily_expenses 
+                    where deleted = 'N' and expense_date >= (expense_date -15)
+                    group by expense_date order by expense_date '''
+    last_15_days_exp_df = pd.read_sql(con=engine, sql=last_15_days_exp_sql)
+    last_15_days_df = get_sale_exp_df(last_15_days_sale_df,last_15_days_exp_df, 'sale_exp_date_str')
+    # print('****last_15_days_exp_df:::', last_15_days_exp_df)
+    daily = last_15_days_df.to_dict(orient="records")
+
+    weekly_sale_sql = f''' SELECT extract(week from sale_date) week_no, sum(cash_sale_amount) total_cash_sale 
+                        FROM {DB_SCHEMA}.daily_sales  
+                        where deleted = 'N' and sale_date >= (sale_date -31)
+                        group by extract(week from sale_date) order by extract(week from sale_date) '''
+    weekly_sale_df = pd.read_sql(con=engine, sql=weekly_sale_sql)
+    weekly_exp_sql = f''' SELECT extract(week from expense_date) week_no, sum(expense_amt) total_expense 
+                            FROM {DB_SCHEMA}.daily_expenses  
+                            where deleted = 'N' and expense_date >= (expense_date -31)
+                            group by extract(week from expense_date) order by extract(week from expense_date) '''
+    weekly_exp_df = pd.read_sql(con=engine, sql=weekly_exp_sql)
+    merge_by_col = 'week_no'
+    weekly_df = get_sale_exp_df(weekly_sale_df, weekly_exp_df, merge_by_col)
+    weekly_df[merge_by_col] = weekly_df[merge_by_col].astype(int)
+    # print('****weekly_df:::',weekly_df)
     weekly = weekly_df.to_dict(orient="records")
 
-    monthly_sql = f''' SELECT extract(month from sale_expense_date) id, sum(cash_sale_amount) total_cash_sale, sum(expense_amt) total_expense                        
-                            FROM {DB_SCHEMA}.daily_sale_expense
-                            where sale_expense_date > (sale_expense_date - 190)
-                            group by extract(month from sale_expense_date)
-                            order by extract(month from sale_expense_date) '''
-    monthly_df = pd.read_sql(con=engine, sql=monthly_sql)
+    monthly_sale_sql = f''' SELECT extract(month from sale_date) month_no, sum(cash_sale_amount) total_cash_sale 
+                            FROM {DB_SCHEMA}.daily_sales  
+                            where deleted = 'N' and sale_date >= (sale_date -190)
+                            group by extract(month from sale_date) order by extract(month from sale_date) '''
+    monthly_sale_df = pd.read_sql(con=engine, sql=monthly_sale_sql)
+    monthly_exp_sql = f''' SELECT extract(month from expense_date) month_no, sum(expense_amt) total_expense 
+                                FROM {DB_SCHEMA}.daily_expenses  
+                                where deleted = 'N' and expense_date >= (expense_date -190)
+                                group by extract(month from expense_date) order by extract(month from expense_date) '''
+    monthly_exp_df = pd.read_sql(con=engine, sql=monthly_exp_sql)
+    merge_by_col = 'month_no'
+    monthly_df = get_sale_exp_df(monthly_sale_df, monthly_exp_df, merge_by_col)
+    monthly_df[merge_by_col] = monthly_df[merge_by_col].astype(int)
+    # print('****monthly_df:::', monthly_df)
     monthly = monthly_df.to_dict(orient="records")
 
     rs_json = {'daily': daily, 'weekly':weekly, 'monthly':monthly }
     return rs_json
+
+def get_sale_exp_df(sale_df, exp_df, merge_by_col):
+    df = pd.merge(sale_df, exp_df, on=merge_by_col, how='outer')
+    log.info(f'No of sale expense rows: {df.shape[0]}')
+    df[['total_cash_sale', 'total_expense']] = df[['total_cash_sale', 'total_expense']].replace(np.nan, 0)
+    df['id'] = df[merge_by_col]
+    return df
 
 def add_daily_sale_expense(exp_sale_json):
     log.info(f'add_daily_sale_expense....{exp_sale_json}')
     msg = f'''daily sale expense added !!! '''
     msg_json = {}
     try:
+        created_by = exp_sale_json['created_by']
+        sale_expense_date = exp_sale_json['sale_expense_date']
+        comments = exp_sale_json['comments']
+        sale_json = {'cash_sale_amount': exp_sale_json['cash_sale_amount'], 'sale_date': sale_expense_date, 'created_by': created_by,'comments':comments}
+        sale_df = pd.DataFrame([sale_json])
+
         expense_arr = exp_sale_json['expense_arr']
         exp_rows = []
-        count = 0
         for each_exp in expense_arr:
-            cash_sale_amount = 0 if count > 0 else exp_sale_json['cash_sale_amount']
-            count = count + 1
-            exp_rows.append({'cash_sale_amount': cash_sale_amount,
-                             'sale_expense_date': exp_sale_json['sale_expense_date'],
-                             'comments': exp_sale_json['comments'],
-                             'created_by': exp_sale_json['created_by'],
+            exp_rows.append({'expense_date': sale_expense_date,
+                             'comments': comments,
+                             'created_by': created_by,
                              'expense_type_id': each_exp['expense_type_id'],
                              'expense_amt': each_exp['expense_amt']})
 
-        df = pd.DataFrame(exp_rows)
-        engine = db_engine()
-        df.to_sql('daily_sale_expense', con=engine, schema=DB_SCHEMA, if_exists='append', index=False)
-        msg_json['status'] = SUCCESS
-    except Exception as ex:
-        msg_json['status'] = ERROR
-        msg = f'''Failed to add daily_sale_expense !!! '''
-        traceback.print_exc()
-    log.info(msg)
-    msg_json["message"] = msg
-    return msg_json
+        exp_df = pd.DataFrame(exp_rows)
 
-
-def update_daily_sale_expense(exp_sale_json):
-    sale_expense_id = exp_sale_json['sale_expense_id']
-    log.info(f'update_daily_sale_expense for sale_expense_id: {sale_expense_id}')
-    sql = f''' UPDATE {DB_SCHEMA}.daily_sale_expense set expense_type_id = '{exp_sale_json['expense_type_id']}',
-               cash_sale_amount = '{exp_sale_json['cash_sale_amount']}', expense_amt = '{exp_sale_json['expense_amt']}',
-               sale_expense_date = '{exp_sale_json['sale_expense_date']}',
-               comments = '{exp_sale_json['comments']}', updated_by = '{exp_sale_json['updated_by']}',
-               updated_on = now() where sale_expense_id = '{sale_expense_id}' '''
-    msg = f'''daily_sale_expense updated !!! '''
-    msg_json = {}
-    try:
         engine = db_engine()
         with engine.begin() as con:
-            con.execute(sql)
+            sale_df.to_sql('daily_sales', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
+            exp_df.to_sql('daily_expenses', con=con, schema=DB_SCHEMA, if_exists='append', index=False)
+
         msg_json['status'] = SUCCESS
     except Exception as ex:
         msg_json['status'] = ERROR
-        msg = f'''Failed to update daily_sale_expense !!! '''
-        traceback.print_exc()
-    log.info(msg)
-    msg_json["message"] = msg
-    return msg_json
-
-
-
-def delete_daily_sale_expense(exp_sale_json):
-    sale_expense_id = exp_sale_json['sale_expense_id']
-    log.info(f'delete_daily_sale_expense for sale_expense_id: {sale_expense_id}')
-    sql = f''' UPDATE {DB_SCHEMA}.daily_sale_expense set deleted='Y', updated_by = '{exp_sale_json['updated_by']}',
-               updated_on = now() where sale_expense_id = '{sale_expense_id}' '''
-    msg = f'''daily_sale_expense deleted !!! '''
-    msg_json = {}
-    try:
-        engine = db_engine()
-        with engine.begin() as con:
-            con.execute(sql)
-        msg_json['status'] = SUCCESS
-    except Exception as ex:
-        msg_json['status'] = ERROR
-        msg = f'''Failed to delete daily_sale_expense !!! '''
+        msg = f'''Failed to add daily_sale and expenses !!! '''
         traceback.print_exc()
     log.info(msg)
     msg_json["message"] = msg

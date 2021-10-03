@@ -26,6 +26,21 @@ def fetch_daily_expenses(input={}):
     rs_json = df.to_json(orient="records")
     return rs_json
 
+def fetch_total_daily_expenses(input={}):
+    log.info('find daily_expenses....')
+    engine = db_engine()
+    sql = f''' SELECT cast(se.expense_id as varchar) expense_id, cast(se.expense_id as varchar) id, 
+                    cast(se.expense_type_id as varchar) expense_type_id, e.exp_type,e.expense_name,
+                    se.expense_amt, se.expense_date, to_char(se.expense_date,'DD-Mon-YYYY') expense_date_str,
+                    se."comments", se.created_on, se.created_by, se.updated_on, se.updated_by, se.deleted
+                    FROM {DB_SCHEMA}.daily_expenses se, {DB_SCHEMA}.expense_type e
+                    where se.expense_type_id = e.expense_type_id and se.deleted = 'N' order by se.expense_date desc '''
+
+    df = pd.read_sql(con=engine, sql=sql)
+    log.info(f'daily_expenses no of rows selected : {df.shape[0]}')
+    rs_json = df.to_json(orient="records")
+    return rs_json
+
 def add_daily_expenses(exp_json):
     log.info(f'add_daily_expenses....')
     msg = f'''daily expenses added !!! '''

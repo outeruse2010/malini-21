@@ -34,13 +34,13 @@ const SaleExpense = () => {
 
 
     const daily_cols = [{field: 'sale_expense_date', headerName:'Date',valueGetter: gridDateTime, width:105,  align:'left', headerAlign: "left", type:'date'}
-                        ,{field: 'cash_sale_amount', headerName:'Sale', width:110, align:'left', headerAlign: "left",  type: 'number'}
-                        ,{field: 'expense_amt', headerName:'Expense', width:110, align:'left', headerAlign: "left",  type: 'number'}];
+                        ,{field: 'total_cash_sale', headerName:'Sale', width:110, align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_expense', headerName:'Expense', width:110, align:'left', headerAlign: "left",  type: 'number'}];
     const weekly_cols = [{field: 'id', headerName:'Week No', align:'left',align:'left', headerAlign: "left",   type:'number'}
-                        ,{field: 'total_cash_sale', headerName:'Cash Sale', width:110,  align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_cash_sale', headerName:'Sale', width:110,  align:'left', headerAlign: "left",  type: 'number'}
                         ,{field: 'total_expense', headerName:'Expense', width:110, align:'left', headerAlign: "left",   type: 'number'}];
      const monthly_cols = [{field: 'id', headerName:'Month No',   align:'left', headerAlign: "left", type:'number'}
-                        ,{field: 'total_cash_sale', headerName:'Cash Sale', width:110, align:'left', headerAlign: "left",  type: 'number'}
+                        ,{field: 'total_cash_sale', headerName:'Sale', width:110, align:'left', headerAlign: "left",  type: 'number'}
                         ,{field: 'total_expense', headerName:'Expense', width:110, align:'left', headerAlign: "left",  type: 'number'}];
 
     return (
@@ -48,7 +48,7 @@ const SaleExpense = () => {
                 <Grid item xs={9}> 
                     <Grid container   spacing={2} >
                             <Grid item >                                 
-                                <CustomLineChart title='Last 15 Days Sale Expense'  data = {last_15_days} yfield1={'cash_sale_amount'} ylabel1={'Sale'}  yfield2={'expense_amt'} ylabel2={'Expense'} xfield={'sale_expense_date_str'}/>
+                                <CustomLineChart title='Last 15 Days Sale Expense'  data = {last_15_days} yfield1={'total_cash_sale'} ylabel1={'Sale'}  yfield2={'total_expense'} ylabel2={'Expense'} xfield={'sale_expense_date_str'}/>
                             </Grid>
                              <Grid item > 
                                     <CustomBarChart title='Last 4 Weeks  Sale Expense' data = {weekly}   yfield2={'total_cash_sale'} ylabel2={'Cash Sale'}  yfield3={'total_expense'} ylabel3={'Expend'} xfield={'id'}/>
