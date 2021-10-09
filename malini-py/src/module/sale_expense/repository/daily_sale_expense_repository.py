@@ -16,19 +16,35 @@ from src.constants.app_const import *
 
 def daily_sale_expenses(input={}):
     log.info('find daily_sale_expenses....')
+    from_date = input['from_date']
+    to_date = input['to_date']
     engine = db_engine()
     # , to_char(sale_date,'DD-Mon-YYYY') sale_exp_date_str
     sale_sql = f''' SELECT sale_date  sale_exp_date, sum(cash_sale_amount) total_cash_sale 
-                FROM {DB_SCHEMA}.daily_sales  where deleted = 'N' group by sale_date order by sale_date '''
+                FROM {DB_SCHEMA}.daily_sales  
+                where deleted = 'N' and sale_date >= '{from_date}' and sale_date <= '{to_date}' 
+                group by sale_date order by sale_date '''
     sale_df = pd.read_sql(con=engine, sql=sale_sql)
     log.info(f'No of Sale rows: {sale_df.shape[0]}')
+    total_sale = sale_df['total_cash_sale'].sum()
+
     # to_char(e.expense_date,'DD-Mon-YYYY') sale_exp_date_str,
-    exp_sql = f'''select e.expense_date sale_exp_date, sum(e.expense_amt) total_expense
-                FROM {DB_SCHEMA}.daily_expenses e where e.deleted = 'N'  group by e.expense_date order by e.expense_date '''
+    exp_sql = f'''Select e.expense_date sale_exp_date, sum(e.expense_amt) total_expense
+                FROM {DB_SCHEMA}.daily_expenses e 
+                where e.deleted = 'N' and expense_date >= '{from_date}' and expense_date <= '{to_date}' 
+                group by e.expense_date order by e.expense_date '''
     exp_df = pd.read_sql(con=engine, sql=exp_sql)
     log.info(f'No of expense rows: {exp_df.shape[0]}')
+    total_exp = exp_df['total_expense'].sum()
+
+    profit = total_sale - total_exp
+    total = {'total_sale': total_sale, 'total_expense': total_exp, 'profit': profit }
+    log.info(f'''daily_sale_expenses :: [{from_date} to {to_date}] - total_sale: {total_sale}, total_expense: {total_exp}, profit: {profit} !!! ''')
+
     df = get_sale_exp_df(sale_df, exp_df, 'sale_exp_date')
-    rs_json = df.to_json(orient="records")
+    sale_expense_rows = df.to_dict(orient="records")
+
+    rs_json = {'sale_expense_rows': sale_expense_rows, 'total': total}
     return rs_json
 
 
