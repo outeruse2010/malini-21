@@ -39,9 +39,7 @@ const DailySaleExpense = () => {
     const [toDtErr, setToDtErr] = useState(false);
 
     const [total, setTotal] = useState(0);
-    const [total_txt_color, setTotal_txt_color] = useState('pimary');
-
-
+    const [total_txt_color, setTotal_txt_color] = useState('primary');
 
 
     useEffect(() => {
@@ -132,15 +130,6 @@ const DailySaleExpense = () => {
         setOpenDia(false);
     };
 
-    const [visibleRows, setVisibleRows] = React.useState();
-    const onFilterModelChange = ({state}) => {
-        // console.log('****onFilterModelChange: ')
-        // console.log('****m: ',m.state.rows)
-        // console.log('****m: ',m.state.rows.allRows)
-        // const newRows = visibleSortedGridRowIdsSelector(state);
-        //   setVisibleRows(newRows);
-    };
-    
     
 //   console.log("visibleRows", visibleRows);
 let dt_range_col = { field: 'sale_exp_date', headerName: 'Sale/Exp Date', width: 170, valueGetter: gridDate, headerClassName: appcls.data_grid_header, type:'date'} ;
@@ -150,10 +139,18 @@ if(dateRangeType === 'Monthly'){
 else if(dateRangeType === 'Yearly'){
     dt_range_col = { field: 'sale_exp_date', headerName: 'Sale/Exp Year', width: 180,  headerClassName: appcls.data_grid_header, type:'number'} ;
 }
+
+const profitCellColor = (cellValues) => {
+     let v = cellValues.value;
+     let cls = v > 0 ?  appcls.green_text : appcls.red_text;
+     return (<span className={cls}>{v}</span>);
+};
     const columns = [
         dt_range_col
-        ,{ field: 'total_cash_sale', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header}
-        ,{ field: 'total_expense', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header}
+        ,{ field: 'total_cash_sale', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header, type:'number'}
+        ,{ field: 'total_expense', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header, type:'number'}
+        ,{ field: 'profit', headerName: 'Profit', width: 130,  headerClassName: appcls.data_grid_header, type:'number',
+            renderCell: (cellValues)=>  profitCellColor(cellValues)   }
      ];
 
     const dialog_memo = useMemo(()=> <DialogComp show={openDia} onDialogClose={(ans)=> onDialogClose(ans)}/>, [openDia]);
@@ -175,12 +172,12 @@ else if(dateRangeType === 'Yearly'){
                  <TextField type="date" value={to_date} onChange={onToDateChange} 
                                      label="To Date (dd/mm/yyyy)" variant="outlined"  error={toDtErr}
                                       InputLabelProps={{ shrink: true, }} size="small"/>  
-                {total &&  <Typography color={total_txt_color} > <strong>Total</strong>   [Sale: {total['total_sale']}, Exp: {total['total_expense']}, Profit: {total['profit']} ] </Typography>}
+                {total &&  <Typography color={total_txt_color} > <strong>Total</strong>   [ Sale: {total['total_sale']},  Exp: {total['total_expense']},  Profit: {total['total_profit']} ] </Typography>}
                 <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New </Button>
             </Grid>
 
             <div style={{ height: 500, width: '100%' }}>
-                <DataGrid rows={sale_expense_list} columns={columns} onStateChange={onFilterModelChange}  disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
+                <DataGrid rows={sale_expense_list} columns={columns}  disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
             </div>
 
             <DailySaleExpenseEntry selected_sale_expense={selected_sale_expense} openSaleExpenseModal={openSaleExpenseModal} toggleSaleExpenseModal={toggleSaleExpenseModal} />

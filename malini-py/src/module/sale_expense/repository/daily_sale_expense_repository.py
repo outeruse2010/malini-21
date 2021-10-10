@@ -23,28 +23,29 @@ def daily_sale_expenses(input={}):
     to_date = input['to_date']
     date_range_type = input['dateRangeType']
 
-
     engine = db_engine()
     # , to_char(sale_date,'DD-Mon-YYYY') sale_exp_date_str
 
     sale_sql = sale_date_range_query(date_range_type, from_date, to_date)
-    print(f'***sale_sql: {sale_sql}')
+    # print(f'***sale_sql: {sale_sql}')
     sale_df = pd.read_sql(con=engine, sql=sale_sql)
     log.info(f'No of Sale rows: {sale_df.shape[0]}')
     total_sale = sale_df['total_cash_sale'].sum()
 
     # to_char(e.expense_date,'DD-Mon-YYYY') sale_exp_date_str,
     exp_sql = expense_date_range_query(date_range_type, from_date, to_date)
-    print(f'***exp_sql: {exp_sql}')
+    # print(f'***exp_sql: {exp_sql}')
     exp_df = pd.read_sql(con=engine, sql=exp_sql)
     log.info(f'No of expense rows: {exp_df.shape[0]}')
     total_exp = exp_df['total_expense'].sum()
 
-    profit = total_sale - total_exp
-    total = {'total_sale': total_sale, 'total_expense': total_exp, 'profit': profit }
-    log.info(f'''daily_sale_expenses :: [{from_date} to {to_date}] - total_sale: {total_sale}, total_expense: {total_exp}, profit: {profit} !!! ''')
+    total_profit = total_sale - total_exp
+    total = {'total_sale': total_sale, 'total_expense': total_exp, 'total_profit': total_profit }
+    log.info(f'''daily_sale_expenses :: [{from_date} to {to_date}] - total_sale: {total_sale}, total_expense: {total_exp}, total_profit: {total_profit} !!! ''')
 
     df = get_sale_exp_df(sale_df, exp_df, 'sale_exp_date')
+    df['profit'] = df['total_cash_sale'] - df['total_expense']
+
     sale_expense_rows = df.to_dict(orient="records")
 
     rs_json = {'sale_expense_rows': sale_expense_rows, 'total': total}
