@@ -2,6 +2,8 @@ import React, {useState, useEffect, useMemo} from 'react';
 import { DataGrid ,visibleSortedGridRowIdsSelector} from '@material-ui/data-grid';
 import {TextField, Button, Typography, Grid}  from '@material-ui/core';
 
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import {login_atom} from '../login/login_api';
 import {useRecoilState, useRecoilValue} from 'recoil';
@@ -30,6 +32,7 @@ const DailySaleExpense = () => {
 
     const today = moment().format('YYYY-MM-DD');
     const day_back_30 = moment().subtract(30,'days').format('YYYY-MM-DD');
+    const [dateRangeType, setDateRangeType] = useState('Daily');
     const [from_date, setFrom_date] = useState(day_back_30);
     const [to_date, setTo_date] = useState(today);
     const [fromDtErr, setFromDtErr] = useState(false);
@@ -45,8 +48,9 @@ const DailySaleExpense = () => {
         get_sale_expense_list(day_back_30, today);
     }, []);
 
-    const get_sale_expense_list = (fdt,tdt) =>{
-        const input = {from_date :fdt, to_date: tdt};
+    const get_sale_expense_list = (fdt, tdt, dtRangeType=null) =>{
+        dtRangeType  = dtRangeType ? dtRangeType : dateRangeType ;
+        const input = {dateRangeType: dtRangeType, from_date :fdt, to_date: tdt};
         const sale_exp_res = fetch_daily_sale_expenses(input); 
         sale_exp_res.then(data => {
             if(data['status'] === 'error'){
@@ -62,6 +66,12 @@ const DailySaleExpense = () => {
             }
         });
     }
+
+    const onDateRangeTypeChange = (e) => {
+        const dRangeType = e.target.value;
+        get_sale_expense_list(from_date, to_date, dRangeType);
+        setDateRangeType(dRangeType);
+    };
 
     const onFromDateChange = (e) => {
         let fdt = e.target.value;
@@ -133,9 +143,15 @@ const DailySaleExpense = () => {
     
     
 //   console.log("visibleRows", visibleRows);
-
+let dt_range_col = { field: 'sale_exp_date', headerName: 'Sale/Exp Date', width: 170, valueGetter: gridDate, headerClassName: appcls.data_grid_header, type:'date'} ;
+if(dateRangeType === 'Monthly'){
+    dt_range_col = { field: 'sale_exp_date', headerName: 'Sale/Exp Month', width: 180,  headerClassName: appcls.data_grid_header, type:'number'} ;
+}
+else if(dateRangeType === 'Yearly'){
+    dt_range_col = { field: 'sale_exp_date', headerName: 'Sale/Exp Year', width: 180,  headerClassName: appcls.data_grid_header, type:'number'} ;
+}
     const columns = [
-        { field: 'sale_exp_date', headerName: 'Sale/Exp Date', width: 170, valueGetter: gridDate, headerClassName: appcls.data_grid_header, type:'date'}
+        dt_range_col
         ,{ field: 'total_cash_sale', headerName: 'Cash Sale', width: 140, headerClassName: appcls.data_grid_header}
         ,{ field: 'total_expense', headerName: 'Exp Amt', width: 130, headerClassName: appcls.data_grid_header}
      ];
@@ -148,6 +164,11 @@ const DailySaleExpense = () => {
             <Grid container direction="row" justifyContent="space-between" alignItems="center" className={appcls.title_row}>
                 <Typography variant="h6"> Daily Sale Expenses </Typography>
 
+                <Select   value={dateRangeType}  onChange={onDateRangeTypeChange}  >
+                        <MenuItem value='Daily' > Daily </MenuItem>
+                        <MenuItem value='Monthly'> Monthly </MenuItem>
+                        <MenuItem value='Yearly' > Yearly </MenuItem>
+                </Select>
                 <TextField type="date" value={from_date} onChange={onFromDateChange} 
                                      label="From Date (dd/mm/yyyy)" variant="outlined" error={fromDtErr}
                                       InputLabelProps={{ shrink: true, }} size="small"/>  

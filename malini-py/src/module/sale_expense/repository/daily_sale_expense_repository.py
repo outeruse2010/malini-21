@@ -5,7 +5,7 @@
 # ********************************
 
 import traceback
-
+from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -14,25 +14,28 @@ from src.config.log_config import log
 from src.constants.app_const import *
 
 
+dt = datetime.strptime('2021-09-10', "%Y-%m-%d")
+print(f'***Month: {dt.month}')
+
 def daily_sale_expenses(input={}):
     log.info('find daily_sale_expenses....')
     from_date = input['from_date']
     to_date = input['to_date']
+    date_range_type = input['dateRangeType']
+
+
     engine = db_engine()
     # , to_char(sale_date,'DD-Mon-YYYY') sale_exp_date_str
-    sale_sql = f''' SELECT sale_date  sale_exp_date, sum(cash_sale_amount) total_cash_sale 
-                FROM {DB_SCHEMA}.daily_sales  
-                where deleted = 'N' and sale_date >= '{from_date}' and sale_date <= '{to_date}' 
-                group by sale_date order by sale_date '''
+
+    sale_sql = sale_date_range_query(date_range_type, from_date, to_date)
+    print(f'***sale_sql: {sale_sql}')
     sale_df = pd.read_sql(con=engine, sql=sale_sql)
     log.info(f'No of Sale rows: {sale_df.shape[0]}')
     total_sale = sale_df['total_cash_sale'].sum()
 
     # to_char(e.expense_date,'DD-Mon-YYYY') sale_exp_date_str,
-    exp_sql = f'''Select e.expense_date sale_exp_date, sum(e.expense_amt) total_expense
-                FROM {DB_SCHEMA}.daily_expenses e 
-                where e.deleted = 'N' and expense_date >= '{from_date}' and expense_date <= '{to_date}' 
-                group by e.expense_date order by e.expense_date '''
+    exp_sql = expense_date_range_query(date_range_type, from_date, to_date)
+    print(f'***exp_sql: {exp_sql}')
     exp_df = pd.read_sql(con=engine, sql=exp_sql)
     log.info(f'No of expense rows: {exp_df.shape[0]}')
     total_exp = exp_df['total_expense'].sum()
@@ -46,6 +49,54 @@ def daily_sale_expenses(input={}):
 
     rs_json = {'sale_expense_rows': sale_expense_rows, 'total': total}
     return rs_json
+
+def sale_date_range_query(date_range_type, from_date, to_date):
+    sale_sql = f''' SELECT sale_date  sale_exp_date, sum(cash_sale_amount) total_cash_sale 
+                    FROM {DB_SCHEMA}.daily_sales  
+                    where deleted = 'N' and sale_date >= '{from_date}' and sale_date <= '{to_date}' 
+                    group by sale_date order by sale_date '''
+    if date_range_type == 'Monthly':
+        from_month = datetime.strptime(from_date, "%Y-%m-%d").month
+        to_month = datetime.strptime(to_date, "%Y-%m-%d").month
+        sale_sql = f''' SELECT extract(month from sale_date) sale_exp_date, sum(cash_sale_amount) total_cash_sale 
+                            FROM {DB_SCHEMA}.daily_sales  
+                            where deleted = 'N' and extract(month from sale_date) >= '{from_month}' 
+                            and extract(month from sale_date) <= '{to_month}' 
+                            group by extract(month from sale_date) order by extract(month from sale_date) '''
+    elif date_range_type == 'Yearly':
+        from_year = datetime.strptime(from_date, "%Y-%m-%d").year
+        to_year = datetime.strptime(to_date, "%Y-%m-%d").year
+        sale_sql = f''' SELECT extract(year from sale_date) sale_exp_date, sum(cash_sale_amount) total_cash_sale 
+                                    FROM {DB_SCHEMA}.daily_sales  
+                                    where deleted = 'N' and extract(year from sale_date) >= '{from_year}' 
+                                    and extract(year from sale_date) <= '{to_year}' 
+                                    group by extract(year from sale_date) order by extract(year from sale_date) '''
+    return sale_sql
+
+
+
+def expense_date_range_query(date_range_type, from_date, to_date):
+    expense_sql = f''' SELECT expense_date  sale_exp_date, sum(expense_amt) total_expense 
+                    FROM {DB_SCHEMA}.daily_expenses  
+                    where deleted = 'N' and expense_date >= '{from_date}' and expense_date <= '{to_date}' 
+                    group by expense_date order by expense_date '''
+    if date_range_type == 'Monthly':
+        from_month = datetime.strptime(from_date, "%Y-%m-%d").month
+        to_month = datetime.strptime(to_date, "%Y-%m-%d").month
+        expense_sql = f''' SELECT extract(month from expense_date) sale_exp_date, sum(expense_amt) total_expense 
+                            FROM {DB_SCHEMA}.daily_expenses  
+                            where deleted = 'N' and extract(month from expense_date) >= '{from_month}' 
+                            and extract(month from expense_date) <= '{to_month}' 
+                            group by extract(month from expense_date) order by extract(month from expense_date) '''
+    elif date_range_type == 'Yearly':
+        from_year = datetime.strptime(from_date, "%Y-%m-%d").year
+        to_year = datetime.strptime(to_date, "%Y-%m-%d").year
+        expense_sql = f''' SELECT extract(year from expense_date) sale_exp_date, sum(expense_amt) total_expense 
+                                    FROM {DB_SCHEMA}.daily_expenses  
+                                    where deleted = 'N' and extract(year from expense_date) >= '{from_year}' 
+                                    and extract(year from expense_date) <= '{to_year}' 
+                                    group by extract(year from expense_date) order by extract(year from expense_date) '''
+    return expense_sql
 
 
 
