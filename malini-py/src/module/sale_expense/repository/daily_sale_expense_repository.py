@@ -14,9 +14,6 @@ from src.config.log_config import log
 from src.constants.app_const import *
 
 
-dt = datetime.strptime('2021-09-10', "%Y-%m-%d")
-print(f'***Month: {dt.month}')
-
 def daily_sale_expenses(input={}):
     log.info('find daily_sale_expenses....')
     from_date = input['from_date']
