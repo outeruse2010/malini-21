@@ -18,6 +18,7 @@ import DailySaleExpense from '../content/sale_expense/daily_sale_expense';
 import DailySales from '../content/sale_expense/daily_sales';
 import DailyExpenses from '../content/sale_expense/daily_expenses';
 import DashBoard from './../content/dashboard/dash_board';
+import SupplierGrid from '../content/supplier/SupplierGrid';
 
 const menu_items = [  
   {"title": "Dashboard","component": DashBoard, "path": "/", "icon": "", "divide": false}
@@ -27,6 +28,9 @@ const menu_items = [
   ,{"title": "Daily Sale Expense","component": DailySaleExpense, "path": "/daily_sale_expense", "icon": "", "divide": false}
   ,{"title": "Daily Sales","component": DailySales, "path": "/daily_sales", "icon": "", "divide": false}
   ,{"title": "Daily Expenses","component": DailyExpenses, "path": "/daily_expenses", "icon": "", "divide": false}
+  ,{"title": "Supplier","component": SupplierGrid, "path": "/supplier_list", "icon": "", "divide": false}
+
+
                     ];
 
 function AppMenu() {

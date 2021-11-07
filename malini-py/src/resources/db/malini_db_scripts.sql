@@ -185,18 +185,111 @@ CREATE TABLE malini_schema.daily_expenses(
 
 --drop TABLE malini_schema.daily_sale_expense;
 
-CREATE TABLE malini_schema.daily_sale_expense(
-   sale_expense_id uuid  DEFAULT uuid_generate_v4(),
-   expense_type_id uuid not null,
-   cash_sale_amount decimal DEFAULT 0,
-   expense_amt decimal DEFAULT 0,
-   sale_expense_date date,
+--CREATE TABLE malini_schema.daily_sale_expense(
+--   sale_expense_id uuid  DEFAULT uuid_generate_v4(),
+--   expense_type_id uuid not null,
+--   cash_sale_amount decimal DEFAULT 0,
+--   expense_amt decimal DEFAULT 0,
+--   sale_expense_date date,
+--   comments text,
+--   created_on timestamp default now(),
+--   created_by text,
+--   updated_on timestamp,
+--   updated_by text,
+--   deleted char(1) default 'N',
+--   PRIMARY KEY(sale_expense_id)
+--);
+
+
+--drop TABLE malini_schema.products;
+CREATE TABLE malini_schema.products(
+   product_id uuid  DEFAULT uuid_generate_v4(),
+   product_name text not null,
+   product_type text,
+   quality text,
+   description text,
    comments text,
    created_on timestamp default now(),
    created_by text,
    updated_on timestamp,
    updated_by text,
    deleted char(1) default 'N',
-   PRIMARY KEY(sale_expense_id)
+   PRIMARY KEY(product_id)
 );
+
+
+--drop TABLE malini_schema.suppliers;
+CREATE TABLE malini_schema.suppliers(
+   supplier_id uuid  DEFAULT uuid_generate_v4(),
+   supplier_name text not null,
+   brand text,
+   payment_type text,
+   location text,
+   address text,
+   contact_type text,
+   contact_nos text,
+   email text,
+   whatsapp_no text,
+   description text,
+   comments text,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(supplier_id)
+);
+
+
+--drop TABLE malini_schema.prod_supp_map;
+CREATE TABLE malini_schema.prod_supp_map(
+   product_id uuid not null,
+   supplier_id uuid not null,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(product_id,supplier_id)
+);
+
+
+--drop TABLE malini_schema.product_buy;
+CREATE TABLE malini_schema.product_buy(
+   product_buy_id uuid  DEFAULT uuid_generate_v4(),
+   product_id uuid not null,
+   supplier_id uuid not null,
+   bill_no text  null,
+   bill_amount decimal,
+   bill_date date,
+   comments text,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(product_buy_id)
+);
+
+
+--drop TABLE malini_schema.supplier_payment;
+CREATE TABLE malini_schema.supplier_payment(
+   payment_id uuid  DEFAULT uuid_generate_v4(),
+   supplier_id uuid not null,
+   product_buy_id uuid,
+   bill_no text  null,
+   paid_amount decimal,
+   payment_date date,
+   paid_by text,
+   payment_type text,
+   comments text,
+   created_on timestamp default now(),
+   created_by text,
+   updated_on timestamp,
+   updated_by text,
+   deleted char(1) default 'N',
+   PRIMARY KEY(payment_id)
+);
+
+
 

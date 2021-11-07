@@ -280,6 +280,63 @@ def remove_daily_expense():
     return res
 
 
+# =============== supplier detail     =====================
+
+from src.module.supplier.repository.suppliers_repository import *
+
+@app.route("/fetch_supplier_list",  methods=['POST'])
+def find_supplier_list():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_supplier_list',VIEW_ROLE, supplier_list)
+    return res
+
+@app.route("/add_new_supplier",  methods=['POST'])
+def add_new_supplier():
+    input = request.get_json()
+    res = perform_request(input, 'add_new_supplier',ACTION_ROLE, add_supplier)
+    return res
+
+@app.route("/update_existing_supplier",  methods=['POST'])
+def update_existing_supplier():
+    input = request.get_json()
+    res = perform_request(input, 'update_existing_supplier',ACTION_ROLE, update_supplier)
+    return res
+
+@app.route("/remove_supplier",  methods=['POST'])
+def remove_supplier():
+    input = request.get_json()
+    res = perform_request(input, 'remove_supplier',ACTION_ROLE, delete_supplier)
+    return res
+
+# =============== product detail     =====================
+
+from src.module.product.repository.products_repository import *
+
+@app.route("/fetch_product_list",  methods=['POST'])
+def find_product_list():
+    input = request.get_json()
+    res = perform_request(input, 'fetch_product_list',VIEW_ROLE, product_list)
+    return res
+
+@app.route("/add_new_product",  methods=['POST'])
+def add_new_product():
+    input = request.get_json()
+    res = perform_request(input, 'add_new_product',ACTION_ROLE, add_product)
+    return res
+
+@app.route("/update_existing_product",  methods=['POST'])
+def update_existing_product():
+    input = request.get_json()
+    res = perform_request(input, 'update_existing_product',ACTION_ROLE, update_product)
+    return res
+
+@app.route("/remove_product",  methods=['POST'])
+def remove_product():
+    input = request.get_json()
+    res = perform_request(input, 'remove_product',ACTION_ROLE, delete_product)
+    return res
+
+
 # ***********************user activity *********************
 
 def check_authentication(input, roles):
