@@ -49,7 +49,7 @@ def update_product(input_json):
     log.info(f'update_product for product_id: {product_id}')
     sql = f''' UPDATE {DB_SCHEMA}.products set product_name = '{product_name}', 
                 product_type= '{input_json['product_type']}', quality= '{input_json['quality']}', 
-               description = '{input_json['description']}',comments= '{input_json['comments']}',
+               description = '{input_json['description']}',
                 updated_by = '{input_json['updated_by']}', updated_on = now() 
                 where product_id = '{product_id}' '''
     msg = f'''products detail for product_name [{product_name}] updated !!! '''

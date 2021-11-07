@@ -53,7 +53,7 @@ def update_supplier(input_json):
                 location= '{input_json['location']}', address= '{input_json['address']}',
                 contact_type= '{input_json['contact_type']}', contact_nos= '{input_json['contact_nos']}', 
                 email= '{input_json['email']}', whatsapp_no= '{input_json['whatsapp_no']}',                
-                description = '{input_json['description']}', comments= '{input_json['comments']}',
+                description = '{input_json['description']}', 
                 updated_by = '{input_json['updated_by']}', updated_on = now() 
                 where supplier_id = '{supplier_id}' '''
     msg = f'''suppliers detail for supplier_name [{supplier_name}] updated !!! '''

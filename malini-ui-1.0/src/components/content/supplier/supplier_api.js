@@ -4,8 +4,6 @@ import {call_rest_api} from '../utils/api_utils';
 export const supplier_list_atom = atom({key: "supplier_list_atom", default: []});
 export const act_supplier_list_atom = atom({key: "act_supplier_list_atom", default: {} });
 
-export const act_cus_area_atom = atom({key: "act_cus_area_atom", default: {} });
-
 export const fetch_supplier_list = (input = {}) => {
     return call_rest_api('fetch_supplier_list', input);
 };

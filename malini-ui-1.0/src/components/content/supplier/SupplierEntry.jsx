@@ -38,7 +38,6 @@ const SupplierEntry = ({selected_supplier, openSupplierModal, toggleSupplierModa
     const [email, setEmail] = useState('');
     const [whatsapp_no, setWhatsapp_no] = useState('');
     const [description, setDescription] = useState('');
-    const [comments, setComments] = useState('');
 
     const [supplierNameErr, setSupplierNameErr] = useState(false);
 
@@ -55,7 +54,6 @@ const SupplierEntry = ({selected_supplier, openSupplierModal, toggleSupplierModa
             setEmail(selected_supplier.email);
             setWhatsapp_no(selected_supplier.whatsapp_no);
             setDescription(selected_supplier.description);
-            setComments(selected_supplier.comments);
         }
     }, [openSupplierModal]);
     
@@ -71,7 +69,6 @@ const SupplierEntry = ({selected_supplier, openSupplierModal, toggleSupplierModa
         setEmail('');
         setWhatsapp_no('');
         setDescription('');
-        setComments('');
     }
 
     const onSubmit = (e) => {
@@ -82,11 +79,11 @@ const SupplierEntry = ({selected_supplier, openSupplierModal, toggleSupplierModa
         }
         
         let supplier_json = {supplier_name, brand, payment_type, location, 
-            address, contact_type, contact_nos, email, whatsapp_no, description, comments};
+            address, contact_type, contact_nos, email, whatsapp_no, description};
         const do_update = (action === 'Update');
         if(do_update) {
             supplier_json = {supplier_name, brand, payment_type, location, address,
-                 contact_type, contact_nos, email, whatsapp_no, description, comments, 
+                 contact_type, contact_nos, email, whatsapp_no, description,  
                  'updated_by': user_name, 'supplier_id': selected_supplier['supplier_id']};
         }else{
             supplier_json['created_by'] = user_name; 
@@ -128,8 +125,7 @@ const SupplierEntry = ({selected_supplier, openSupplierModal, toggleSupplierModa
                             <TextField value={whatsapp_no} onChange={e=>{setWhatsapp_no(e.target.value);}} label="Whatsapp_no" fullWidth variant="outlined" className={classes.field}  size="small"/>
                             
                             <TextField value={description} onChange={e=>{setDescription(e.target.value);}} label="Description" multiline rows={3} fullWidth variant="outlined" className={classes.field} size="small"/>
-                            <TextField value={comments} onChange={e=>{setComments(e.target.value);}} label="Comments" multiline rows={3} fullWidth variant="outlined" className={classes.field} size="small"/> 
-
+                           
                             <Stack direction='row' spacing={1}>
                                 <Button type="submit" variant="contained" color="primary" size="small">{action}</Button>
                                 {(action === 'Add New') && <Button type="reset" variant="contained" size="small" className={classes.btn}>Reset</Button>}

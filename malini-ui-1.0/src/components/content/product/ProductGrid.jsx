@@ -5,8 +5,8 @@ import Grid from '@mui/material/Grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import SupplierEntry from './SupplierEntry';
-import {supplier_list_atom,  fetch_supplier_list, delete_supplier,act_supplier_list_atom} from './supplier_api';
+import ProductEntry from './ProductEntry';
+import {product_list_atom,  fetch_product_list, delete_product,act_product_list_atom} from './product_api';
 
 import {login_atom} from '../login/login_api';
 import {useRecoilState, useRecoilValue} from 'recoil';
@@ -17,55 +17,55 @@ import { AppStyles } from './../utils/app_styles';
 
 import DeleteDataComp from './../utils/DeleteDataComp';
 
-const SupplierGrid = () => {
+const ProductGrid = () => {
     const classes = AppStyles();
     const login_data = useRecoilValue(login_atom);
     const user_name = login_data.user_name;
     const allow_update = (login_data.allow_update === 'Y');
 
-    const [supplier_list, setSupplier_list] = useRecoilState(supplier_list_atom);
-    const [act_supplier_res, setAct_supplier_res] = useRecoilState(act_supplier_list_atom);
+    const [product_list, setProduct_list] = useRecoilState(product_list_atom);
+    const [act_product_res, setAct_product_res] = useRecoilState(act_product_list_atom);
     
     const [act_message, setAct_message] = useRecoilState(message_atom);
-    const [openSupplierModal, setOpenSupplierModal] = useState(false);
-    const [selected_supplier, setSelected_supplier] = useState(null);
+    const [openProductModal, setOpenProductModal] = useState(false);
+    const [selected_product, setSelected_product] = useState(null);
 
     const [openDelModal, setOpenDelModal] = useState(false);
     const [title, setTitle] = useState('');
 
 
     useEffect(() => {
-            const supplier_res = fetch_supplier_list();            
-            supplier_res.then(data => {
+            const product_res = fetch_product_list();            
+            product_res.then(data => {
                 if(data['status'] === 'error'){
-                    setAct_message(supplier_res);
+                    setAct_message(product_res);
                 }else {
-                    setSupplier_list(data);
+                    setProduct_list(data);
                 }
             });
         }, []);
 
     
 
-    const toggleSupplierModal = () => {        
-        setOpenSupplierModal(!openSupplierModal);
+    const toggleProductModal = () => {        
+        setOpenProductModal(!openProductModal);
     };
 
     const onAddNewClick = () => {
-        setSelected_supplier(null);
-        toggleSupplierModal();
+        setSelected_product(null);
+        toggleProductModal();
     }
 
     const onDeleteClick = (row) => {
-        setSelected_supplier(row);
-        let title = '  Supplier [' + row['supplier_name'] + '] ';
+        setSelected_product(row);
+        let title = '  Product [' + row['product_name'] + '] ';
         setTitle(title);
         toggleDelModal();
     };
 
     const onEditClick = (row) => {
-        setSelected_supplier(row);
-        setOpenSupplierModal(true);
+        setSelected_product(row);
+        setOpenProductModal(true);
     };
 
     const toggleDelModal = () => {        
@@ -73,16 +73,16 @@ const SupplierGrid = () => {
     };
 
     const onDelete = (comments) => {
-        let supplier_id = selected_supplier['supplier_id'];
-        let supplier_name = selected_supplier['supplier_name'];
-        let input_json = {supplier_id, supplier_name, comments, updated_by: user_name};
+        let product_id = selected_product['product_id'];
+        let product_name = selected_product['product_name'];
+        let input_json = {product_id, product_name, comments, updated_by: user_name};
 
-            const res = delete_supplier(input_json);
+            const res = delete_product(input_json);
             res.then(data => {
-                setAct_supplier_res(data);
+                setAct_product_res(data);
                 if(data.status === 'success'){
-                    const supplier_res = fetch_supplier_list();
-                    supplier_res.then(suppliers => setSupplier_list(suppliers));
+                    const product_res = fetch_product_list();
+                    product_res.then(products => setProduct_list(products));
                 }            
                 setAct_message(data);
                 toggleDelModal();
@@ -107,15 +107,10 @@ const SupplierGrid = () => {
     }
 	
 
-
     const columns = [ 
-        { field: 'supplier_name', headerName: 'Name', width: 180, headerClassName: classes.data_grid_header}
-		,{ field: 'brand', headerName: 'Brand', width: 300, headerClassName: classes.data_grid_header}
-		,{ field: 'location', headerName: 'Location', width: 300, headerClassName: classes.data_grid_header}
-		,{ field: 'address', headerName: 'Address', width: 300, headerClassName: classes.data_grid_header}
-        ,{ field: 'contact_type', headerName: 'Contact Type', width: 300, headerClassName: classes.data_grid_header}
-		,{ field: 'contact_nos', headerName: 'Contact Nos', width: 300, headerClassName: classes.data_grid_header}
-		,{ field: 'whatsapp_no', headerName: 'Whatsapp No', width: 300, headerClassName: classes.data_grid_header}
+        { field: 'product_name', headerName: 'Name', width: 180, headerClassName: classes.data_grid_header}
+		,{ field: 'product_type', headerName: 'Type', width: 300, headerClassName: classes.data_grid_header}
+		,{ field: 'quality', headerName: 'Quality', width: 300, headerClassName: classes.data_grid_header}
 		,{ field: 'description', headerName: 'Description', width: 300, headerClassName: classes.data_grid_header}
 		,{ field: 'comments', headerName: 'Comments', width: 300, headerClassName: classes.data_grid_header}
 		
@@ -136,15 +131,15 @@ const SupplierGrid = () => {
             <SnakbarComp />
 
             <Grid container direction="row" justifyContent="space-between" alignItems="center" className={classes.title_row}>
-                <Typography variant="h6"> Suppliers </Typography>
-                {allow_update  && <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New Supplier</Button>}
+                <Typography variant="h6"> Products </Typography>
+                {allow_update  && <Button type="button" onClick={onAddNewClick} size="small" color="primary" startIcon={<AddIcon />}> Add New Product</Button>}
             </Grid>
 
             <div style={{ height: 500, width: '100%' }}>
-                <DataGrid rows={supplier_list} columns={columns}   disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
+                <DataGrid rows={product_list} columns={columns}   disableSelectionOnClick rowsPerPageOptions={[]} rowHeight={30} headerHeight={32}/>
             </div>
 
-            <SupplierEntry selected_supplier={selected_supplier} openSupplierModal={openSupplierModal} toggleSupplierModal={toggleSupplierModal} />
+            <ProductEntry selected_product={selected_product} openProductModal={openProductModal} toggleProductModal={toggleProductModal} />
            
            <DeleteDataComp title={title}  openDelModal ={openDelModal} toggleDelModal={toggleDelModal} onDelete={onDelete} />
                                    
@@ -152,4 +147,4 @@ const SupplierGrid = () => {
     );
 }
 
-export default SupplierGrid;
+export default ProductGrid;

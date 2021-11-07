@@ -19,6 +19,7 @@ import DailySales from '../content/sale_expense/daily_sales';
 import DailyExpenses from '../content/sale_expense/daily_expenses';
 import DashBoard from './../content/dashboard/dash_board';
 import SupplierGrid from '../content/supplier/SupplierGrid';
+import ProductGrid from '../content/product/ProductGrid';
 
 const menu_items = [  
   {"title": "Dashboard","component": DashBoard, "path": "/", "icon": "", "divide": false}
@@ -29,7 +30,7 @@ const menu_items = [
   ,{"title": "Daily Sales","component": DailySales, "path": "/daily_sales", "icon": "", "divide": false}
   ,{"title": "Daily Expenses","component": DailyExpenses, "path": "/daily_expenses", "icon": "", "divide": false}
   ,{"title": "Supplier","component": SupplierGrid, "path": "/supplier_list", "icon": "", "divide": false}
-
+  ,{"title": "Product","component": ProductGrid, "path": "/product_list", "icon": "", "divide": false}
 
                     ];
 
